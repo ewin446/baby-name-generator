@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>宝宝取名智能定制系统 | 500套高分好名</title>
+  <style>
+    /* 全局样式：小红书母婴风（粉色主调+柔和圆角） */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+
+    body {
+      background-color: #fef7f9; /* 小红书浅粉背景 */
+      color: #333;
+      padding: 15px;
+      line-height: 1.5;
+    }
+
+    /* 主容器：模拟小红书笔记卡片 */
+    .container {
+      max-width: 550px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px; /* 小红书同款大圆角 */
+      padding: 25px;
+      box-shadow: 0 2px 12px rgba(255, 105, 135, 0.1);
+    }
+
+    /* 标题区域：还原原商品的温馨标题 */
+    .title-area {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #fee;
+    }
+
+    .main-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff2442; /* 小红书品牌红 */
+      margin-bottom: 8px;
+    }
+
+    .sub-title {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* 激活码验证区（核心权限控制） */
+    .auth-area {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: #fcf0f3;
+      border-radius: 12px;
+    }
+
+    .auth-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #ff2442;
+    }
+
+    /* 输入框样式：还原小红书表单风格 */
+    .input-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 12px;
+      border: 1px solid #ffd1dc;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #fff;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #ff2442;
+      box-shadow: 0 0 0 2px rgba(255, 36, 66, 0.1);
+    }
+
+    /* 按钮样式：小红书同款红色按钮 */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: #ff2442;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #e61f3d;
+    }
+
+    .btn-secondary {
+      background: #f8f8f8;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #f0f0f0;
+    }
+
+    /* 名字结果区 */
+    .result-area {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .result-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #ff2442;
+    }
+
+    /* 名字列表：卡片式双列布局 */
+    .name-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    /* 名字卡片样式 */
+    .name-card {
+      background: #fff;
+      border: 1px solid #fee;
+      border-radius: 10px;
+      padding: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .name-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 105, 135, 0.15);
+      border-color: #ff2442;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .name-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .score-tag {
+      background: #ffeff3;
+      color: #ff2442;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* 来源标签 */
+    .source-tag {
+      display: inline-block;
+      background: #f8f8f8;
+      color: #999;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    /* 寓意解析区 */
+    .meaning-area {
+      border-top: 1px dashed #ffd1dc;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .meaning-text {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 收藏按钮 */
+    .collect-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ccc;
+      transition: all 0.2s;
+      z-index: 1;
+    }
+
+    .collect-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .collected {
+      color: #ff2442;
+    }
+
+    /* 名字解析模块：还原原商品的多维度解析 */
+    .analysis-area {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fcf0f3;
+      border-radius: 8px;
+    }
+
+    .analysis-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #ff2442;
+    }
+
+    .analysis-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    /* 收藏展示区 */
+    .favorites-area {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .favorites-area.show {
+      display: block;
+    }
+
+    .favorites-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #ff2442;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .favorites-count {
+      font-size: 12px;
+      color: #999;
+      font-weight: 400;
+    }
+
+    .favorites-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .empty-favorites {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .empty-favorites::before {
+      content: "♡";
+      display: block;
+      font-size: 48px;
+      margin-bottom: 10px;
+      opacity: 0.3;
+    }
+
+    /* 删除按钮 */
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 12px;
+      background: #fff;
+      border: 1px solid #ffd1dc;
+      color: #ff2442;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .delete-btn:hover {
+      background: #ff2442;
+      color: #fff;
+    }
+
+    /* 收藏按钮（列表视图用） */
+    .collect-btn {
+      font-size: 12px;
+      color: #ff2442;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .collect-btn::before {
+      content: "♡";
+      margin-right: 4px;
+    }
+
+    .collected::before {
+      content: "♥";
+    }
+
+    /* 售后提示区：还原原商品的版权/售后 */
+    .footer-tips {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #fee;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .tips-item {
+      margin-bottom: 5px;
+    }
+
+    /* 隐藏模块 */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 标题区域 -->
+    <div class="title-area">
+      <div class="main-title">宝宝取名定制工具 | 500套高分好名</div>
+      <div class="sub-title">按姓氏/生日定制 · 男女各250个 · 含详细解析</div>
+    </div>
+
+    <!-- 主功能区 -->
+    <div id="mainFunction">
+      <!-- 宝宝信息输入区 -->
+      <div class="input-group">
+        <label>宝宝姓氏</label>
+        <input type="text" id="surname" placeholder="请输入姓氏">
+      </div>
+
+      <div class="input-group">
+        <label>出生日期</label>
+        <input type="date" id="birthDate">
+        <div id="birthDateTip" style="font-size: 12px; color: #999; margin-top: 5px; display: none;"></div>
+      </div>
+
+      <div class="input-group">
+        <label>宝宝状态</label>
+        <select id="babyStatus">
+          <option value="born">已出生（可修改1次生日）</option>
+          <option value="unborn">未出生</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>宝宝性别</label>
+        <select id="gender">
+          <option value="girl">女宝</option>
+          <option value="boy">男宝</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>名字风格</label>
+        <select id="style">
+          <option value="classical">古典文雅</option>
+          <option value="modern">简约现代</option>
+          <option value="poetic">诗意文艺</option>
+        </select>
+      </div>
+
+      <button class="btn" onclick="generateNames()">生成500套高分名字</button>
+
+      <!-- 名字结果区 -->
+      <div class="result-area" id="resultArea">
+        <div class="result-title">定制名字推荐（综合评分90+）</div>
+        <div class="name-list" id="nameList"></div>
+
+        <!-- 收藏展示区 -->
+        <div class="favorites-area" id="favoritesArea">
+          <div class="favorites-title">
+            我的收藏
+            <span class="favorites-count" id="favoritesCount">已收藏 0 个名字</span>
+          </div>
+          <div class="favorites-list" id="favoritesList"></div>
+        </div>
+
+        <!-- 名字解析示例 -->
+        <div class="analysis-area">
+          <div class="analysis-title">名字解析示例（徐昱宁）</div>
+          <div class="analysis-item">
+            <span>读音韵律：</span>
+            <span style="color: #ff2442; font-weight: 600;">93分</span>
+          </div>
+          <div class="analysis-item">
+            <span>字形结构：</span>
+            <span style="color: #ff2442; font-weight: 600;">95分</span>
+          </div>
+          <div class="analysis-item">
+            <span>文化内涵：</span>
+            <span style="color: #ff2442; font-weight: 600;">91分</span>
+          </div>
+          <div class="analysis-item">
+            <span>整体平衡：</span>
+            <span style="color: #ff2442; font-weight: 600;">97分</span>
+          </div>
+          <div class="analysis-item" style="margin-top: 10px;">
+            <span>寓意解读：</span>
+            <span style="color: #666;">昱照心宁，内外澄明</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 售后提示区 -->
+    <div class="footer-tips">
+      <div class="tips-item">✅ 名字仅供参考，实际决定权在父母</div>
+      <div class="tips-item">✅ 虚拟服务不支持无理由退换，生日可修改1次</div>
+      <div class="tips-item">✅ 欢迎使用，祝宝宝起个好名字！</div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // 宝宝状态和生日修改逻辑
+    // ============================================
+
+    // 初始化：读取修改次数和状态
+    function initBabyStatusLogic() {
+      const babyStatusSelect = document.getElementById('babyStatus');
+      const birthDateInput = document.getElementById('birthDate');
+      const birthDateTip = document.getElementById('birthDateTip');
+
+      // 读取localStorage中的修改次数（默认0次）
+      const modifyCount = parseInt(localStorage.getItem('birthDateModifyCount') || '0');
+      const currentStatus = localStorage.getItem('babyStatus') || 'born';
+
+      // 恢复之前选择的状态
+      babyStatusSelect.value = currentStatus;
+      birthDateInput.value = localStorage.getItem('birthDate') || '';
+
+      // 根据状态和修改次数控制输入框
+      updateBirthDateState(currentStatus, modifyCount);
+
+      // 监听状态变化
+      babyStatusSelect.addEventListener('change', function() {
+        const newStatus = this.value;
+        localStorage.setItem('babyStatus', newStatus);
+
+        // 如果从未出生切换到已出生，重置修改次数为0
+        if (newStatus === 'born' && currentStatus === 'unborn') {
+          localStorage.setItem('birthDateModifyCount', '0');
+          updateBirthDateState(newStatus, 0);
+        } else {
+          updateBirthDateState(newStatus, modifyCount);
+        }
+      });
+
+      // 监听生日输入框的变化（记录修改次数）
+      birthDateInput.addEventListener('change', function() {
+        handleBirthDateChange(this.value);
+      });
+    }
+
+    // 处理生日修改
+    function handleBirthDateChange(newValue) {
+      const babyStatusSelect = document.getElementById('babyStatus');
+      const currentStatus = babyStatusSelect.value;
+      const birthDateInput = document.getElementById('birthDate');
+      const birthDateTip = document.getElementById('birthDateTip');
+
+      // 未出生状态不限制修改
+      if (currentStatus === 'unborn') {
+        localStorage.setItem('birthDate', newValue);
+        return;
+      }
+
+      // 已出生状态，检查修改次数
+      let modifyCount = parseInt(localStorage.getItem('birthDateModifyCount') || '0');
+      const oldBirthDate = localStorage.getItem('birthDate') || '';
+
+      // 如果新值与旧值相同，不算修改
+      if (newValue === oldBirthDate) {
+        return;
+      }
+
+      // 如果是首次设置（之前为空），不算修改
+      if (!oldBirthDate) {
+        localStorage.setItem('birthDate', newValue);
+        updateBirthDateState(currentStatus, modifyCount);
+        return;
+      }
+
+      // 检查修改次数
+      if (modifyCount >= 1) {
+        // 超过修改次数限制
+        alert('温馨提示：已出生宝宝的生日仅可修改1次，您已用完修改机会。如需再次修改，请联系客服处理。');
+        // 恢复为旧值
+        birthDateInput.value = oldBirthDate;
+        return;
+      }
+
+      // 记录修改
+      modifyCount++;
+      localStorage.setItem('birthDateModifyCount', modifyCount.toString());
+      localStorage.setItem('birthDate', newValue);
+
+      // 更新状态
+      updateBirthDateState(currentStatus, modifyCount);
+
+      // 提示用户
+      if (modifyCount >= 1) {
+        alert('生日修改成功！已用完1次修改机会，生日输入框将锁定。');
+      }
+    }
+
+    // 更新生日输入框状态
+    function updateBirthDateState(babyStatus, modifyCount) {
+      const birthDateInput = document.getElementById('birthDate');
+      const birthDateTip = document.getElementById('birthDateTip');
+
+      if (babyStatus === 'unborn') {
+        // 未出生：不限制修改
+        birthDateInput.disabled = false;
+        birthDateTip.style.display = 'none';
+      } else {
+        // 已出生：根据修改次数控制
+        if (modifyCount >= 1) {
+          // 已用完1次修改机会
+          birthDateInput.disabled = true;
+          birthDateTip.style.display = 'block';
+          birthDateTip.textContent = '⚠️ 已用完1次修改机会，生日已锁定';
+          birthDateTip.style.color = '#ff2442';
+        } else {
+          // 还可以修改1次
+          birthDateInput.disabled = false;
+          birthDateTip.style.display = 'block';
+          birthDateTip.textContent = '✓ 已出生宝宝可修改1次生日';
+          birthDateTip.style.color = '#999';
+        }
+      }
+    }
+
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', initBabyStatusLogic);
+
+    // 2. 复刻原商品的名字库（男女各250+，示例先放核心名字）
+    const nameDatabase = {
+      girl: {
+        classical: [
+          { name: "沛恩", source: "《诗经·大雅》", meaning: "沛雨甘霖，恩泽绵长；如春雨般滋润人心，充满仁爱与慈悲。" },
+          { name: "诗宜", source: "《楚辞·九歌》", meaning: "诗情画意，宜室宜家；如诗般温婉动人，适合宜室宜家的女子。" },
+          { name: "书瑶", source: "《楚辞》", meaning: "书香门第，瑶台仙宫；既有书香气质，又如美玉般珍贵。" },
+          { name: "清然", source: "《诗经》", meaning: "清雅脱俗，淡然处世；如清泉般纯洁，态度淡然从容。" },
+          { name: "念希", source: "《诗经》", meaning: "念念不忘，希望永存；心中怀揣希望，永不放弃美好念想。" },
+          { name: "安禾", source: "《论语》", meaning: "平安喜乐，禾苗茁壮；如禾苗般茁壮成长，一生平安。" },
+          { name: "若溪", source: "《诗经》", meaning: "如溪水般清澈明净，源远流长，给人清新脱俗之感。" },
+          { name: "语桐", source: "《诗经》", meaning: "温言软语，梧桐叶茂；话语温柔如春风，如梧桐般茂盛。" },
+          { name: "芷萱", source: "《楚辞》", meaning: "芷草清香，萱草忘忧；清香淡雅，无忧无虑。" },
+          { name: "雨桐", source: "《诗经》", meaning: "雨润梧桐，生机勃勃；如雨后梧桐般充满生命力。" },
+          { name: "雪琴", source: "《诗经》", meaning: "雪中抚琴，高雅脱俗；如雪中抚琴般高雅清雅。" },
+          { name: "婉清", source: "《诗经·郑风》", meaning: "温婉可人，清雅脱俗；性格温柔，气质清雅。" },
+          { name: "梦琪", source: "《诗经》", meaning: "梦境美好，琪玉无瑕；如美玉般美好珍贵。" },
+          { name: "雅琴", source: "《诗经》", meaning: "雅致高洁，琴声悠扬；高雅脱俗，如琴声般优雅。" },
+          { name: "思琪", source: "《楚辞》", meaning: "思绪深远，琪玉生辉；心思细腻，如美玉般珍贵。" },
+          { name: "语嫣", source: "《诗经》", meaning: "温言软语，嫣然一笑；说话温柔动人，笑容美好。" },
+          { name: "雪妍", source: "《诗经》", meaning: "雪中美人，妍丽动人；如雪中美人般纯洁美丽。" },
+          { name: "诗涵", source: "《诗经》", meaning: "诗情画意，涵养深厚；既有诗情，又有涵养。" },
+          { name: "晓琪", source: "《楚辞》", meaning: "晨曦初照，琪玉生辉；如晨曦中的美玉般明亮。" },
+          { name: "雨涵", source: "《诗经》", meaning: "雨露滋润，涵养深厚；如雨露般滋润，内涵丰富。" },
+          { name: "诗琪", source: "《诗经》", meaning: "诗意人生，琪玉无瑕；生活如诗，品质如玉。" },
+          { name: "雪茹", source: "《诗经》", meaning: "雪中绽放，茹蕙芬芳；如雪中绽放的花朵般美好。" },
+          { name: "思颖", source: "《楚辞》", meaning: "思虑深远，颖悟绝伦；心思细腻，聪慧过人。" },
+          { name: "语琴", source: "《诗经》", meaning: "温言软语，琴声悠扬；话语温柔，如琴声般悦耳。" },
+          { name: "雨萱", source: "《诗经》", meaning: "雨中萱草，忘忧无愁；如雨中萱草般无忧无虑。" },
+          { name: "雅琪", source: "《楚辞》", meaning: "雅致高洁，琪玉无瑕；高雅脱俗，如美玉般珍贵。" }
+        ],
+        modern: [
+          { name: "艺霖", source: "《唐诗选》", meaning: "艺术天成，如霖润泽；多才多艺，如甘霖般滋润他人。" },
+          { name: "文昕", source: "《论语》", meaning: "文质彬彬，昕光初照；既有文化修养，又如朝阳般充满希望。" },
+          { name: "忆", source: "《诗经》", meaning: "追忆美好，念念不忘；如美好回忆般令人难以忘怀。" },
+          { name: "浔", source: "《诗经》", meaning: "浔江悠远，深藏不露；如江水般深沉悠远，内涵丰富。" },
+          { name: "时", source: "《论语》", meaning: "天时地利，时机恰好；如恰逢其时，万事顺遂。" },
+          { name: "语桐", source: "《宋词》", meaning: "温言软语，梧桐叶茂；话语温柔如春风，如梧桐般茂盛。" },
+          { name: "欣妍", source: "《现代诗歌》", meaning: "欣喜美好，妍丽动人；充满喜悦，美丽动人。" },
+          { name: "雨婷", source: "《现代文学》", meaning: "雨露滋润，婷婷玉立；如雨后般清新，身姿优美。" },
+          { name: "诗涵", source: "《现代诗歌》", meaning: "诗意人生，涵养深厚；生活如诗，内涵丰富。" },
+          { name: "梦洁", source: "《现代文学》", meaning: "梦中纯洁，洁白无瑕；如梦境般美好，内心纯洁。" },
+          { name: "雪怡", source: "《现代诗歌》", meaning: "雪中怡然，快乐无忧；如雪中般纯净，心境怡然。" },
+          { name: "思涵", source: "《现代文学》", meaning: "心思细腻，涵养深厚；思考深入，内涵丰富。" },
+          { name: "雨欣", source: "《现代诗歌》", meaning: "雨露滋润，欣喜美好；如雨露般滋润，充满喜悦。" },
+          { name: "晓婷", source: "《现代文学》", meaning: "晨曦初照，婷婷玉立；如朝阳般明亮，身姿优美。" },
+          { name: "雨萱", source: "《现代诗歌》", meaning: "雨中萱草，忘忧无愁；如雨中萱草般无忧无虑。" },
+          { name: "梦涵", source: "《现代文学》", meaning: "梦境美好，涵养深厚；如梦般美好，内涵丰富。" },
+          { name: "雪涵", source: "《现代诗歌》", meaning: "雪中涵养，纯洁美好；如雪中般纯净，内涵丰富。" },
+          { name: "思婷", source: "《现代文学》", meaning: "心思细腻，婷婷玉立；心思温柔，身姿优美。" },
+          { name: "雨琪", source: "《现代诗歌》", meaning: "雨露滋润，琪玉无瑕；如雨露般滋润，如美玉般珍贵。" },
+          { name: "晓涵", source: "《现代文学》", meaning: "晨曦初照，涵养深厚；如朝阳般明亮，内涵丰富。" },
+          { name: "梦怡", source: "《现代文学》", meaning: "梦中怡然，快乐无忧；如梦般美好，心境怡然。" },
+          { name: "雪琪", source: "《现代诗歌》", meaning: "雪中琪玉，纯洁珍贵；如雪中美玉般珍贵美好。" },
+          { name: "思琪", source: "《现代文学》", meaning: "思绪深远，琪玉生辉；心思细腻，如美玉般珍贵。" },
+          { name: "雨妍", source: "《现代诗歌》", meaning: "雨露滋润，妍丽动人；如雨露般滋润，美丽动人。" },
+          { name: "晓琪", source: "《现代文学》", meaning: "晨曦初照，琪玉生辉；如朝阳中的美玉般明亮。" },
+          { name: "雨洁", source: "《现代诗歌》", meaning: "雨露滋润，纯洁无瑕；如雨露般滋润，内心纯洁。" }
+        ],
+        poetic: [
+          { name: "景玥", source: "《易经》", meaning: "景星庆云，美玉生辉；如景星瑞云般吉祥，如美玉般温润。" },
+          { name: "姗笛", source: "《宋词》", meaning: "姗姗而来，笛声悠扬；如笛声般优美动听，给人优雅感觉。" },
+          { name: "瑞雪", source: "《诗经·小雅》", meaning: "瑞雪兆丰，洁白无瑕；如瑞雪般吉祥美好，纯洁无暇。" },
+          { name: "月忆", source: "《唐诗》", meaning: "月圆人圆，美好回忆；如月光般温柔，承载美好记忆。" },
+          { name: "梦霖", source: "《诗经》", meaning: "梦中甘霖，滋润心田；如甘霖般滋润，如梦境般美好。" },
+          { name: "澹月", source: "《唐诗》", meaning: "澹泊宁静，月光如水；如月光般淡雅宁静，心境平和。" },
+          { name: "知予", source: "《易经》", meaning: "知书达理，予取予求；既知书达理，又懂得给予和宽容。" },
+          { name: "海樱", source: "《楚辞》", meaning: "海纳百川，樱花烂漫；既有大海般宽广胸怀，又似樱花般美丽。" },
+          { name: "若溪", source: "《唐诗》", meaning: "如溪水般清澈明净，源远流长，给人清新脱俗之感。" },
+          { name: "星愿", source: "《诗经》", meaning: "星辰心愿，美好愿望；如星辰般闪耀，承载美好心愿。" },
+          { name: "梦如", source: "《诗经》", meaning: "梦中佳人，如诗如画；如梦中的美人般美好如诗。" },
+          { name: "雪儿", source: "《诗经》", meaning: "雪中精灵，纯洁无瑕；如雪中的精灵般纯洁可爱。" },
+          { name: "月华", source: "《诗经》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" },
+          { name: "雨薇", source: "《楚辞》", meaning: "雨中蔷薇，美丽动人；如雨中蔷薇般美丽动人。" },
+          { name: "梦华", source: "《诗经》", meaning: "梦中繁华，美好如画；如梦中的繁华般美好。" },
+          { name: "星语", source: "《诗经》", meaning: "星辰低语，美好祝愿；如星辰般低语，传递美好祝愿。" },
+          { name: "月心", source: "《楚辞》", meaning: "月下心语，温柔恬静；如月下倾诉心事般温柔。" },
+          { name: "雪梦", source: "《诗经》", meaning: "雪中梦境，纯洁美好；如雪中的梦境般纯洁美好。" },
+          { name: "梦薇", source: "《诗经》", meaning: "梦中蔷薇，美丽动人；如梦中的蔷薇般美丽动人。" },
+          { name: "星柔", source: "《楚辞》", meaning: "星辰温柔，柔情似水；如星辰般温柔，柔情似水。" },
+          { name: "月柔", source: "《诗经》", meaning: "月下温柔，柔情万种；如月下般温柔，柔情万种。" },
+          { name: "雪语", source: "《诗经》", meaning: "雪中低语，温柔倾诉；如雪中低语般温柔倾诉。" },
+          { name: "星柔", source: "《楚辞》", meaning: "星辰温柔，柔情似水；如星辰般温柔，柔情似水。" },
+          { name: "梦如", source: "《诗经》", meaning: "梦中佳人，如诗如画；如梦中的美人般美好如诗。" },
+          { name: "月华", source: "《楚辞》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" }
+        ]
+      },
+      boy: {
+        classical: [
+          { name: "子谦", source: "《诗经》", meaning: "谦谦君子，温润如玉；谦虚谨慎，品德高尚。" },
+          { name: "承泽", source: "《易经》", meaning: "承天之佑，恩泽万代；承受天恩，福泽绵长。" },
+          { name: "嘉佑", source: "《诗经》", meaning: "嘉言懿行，天佑吉人；言行美好，上天保佑。" },
+          { name: "泽宇", source: "《易经》", meaning: "恩泽广布，宇宙胸怀；心怀宇宙，恩泽众人。" },
+          { name: "博文", source: "《论语》", meaning: "博学多才，文质彬彬；学识渊博，文雅有礼。" },
+          { name: "思远", source: "《楚辞》", meaning: "思虑深远，志向远大；心怀远大志向，目光长远。" },
+          { name: "浩然", source: "《孟子》", meaning: "浩然正气，天地同在；正气凛然，如天地般博大。" },
+          { name: "弘毅", source: "《论语》", meaning: "弘大刚毅，志向远大；意志坚定，胸怀宽广。" },
+          { name: "子墨", source: "《诗经》", meaning: "文房四宝，书香门第；文化底蕴深厚，才华横溢。" },
+          { name: "子涵", source: "《楚辞》", meaning: "涵养深厚，品德高尚；内涵丰富，品格高尚。" },
+          { name: "思源", source: "《诗经》", meaning: "饮水思源，不忘初心；懂得感恩，不忘初心。" },
+          { name: "浩宇", source: "《楚辞》", meaning: "胸怀宇宙，浩然正气；心胸宽广，正气凛然。" },
+          { name: "子轩", source: "《论语》", meaning: "气宇轩昂，才华横溢；气度不凡，才华出众。" },
+          { name: "嘉泽", source: "《诗经》", meaning: "嘉言懿行，恩泽绵长；言行美好，福泽深厚。" },
+          { name: "博文", source: "《论语》", meaning: "博学多才，文质彬彬；学识渊博，文雅有礼。" },
+          { name: "弘毅", source: "《论语》", meaning: "弘大刚毅，志向远大；意志坚定，胸怀宽广。" },
+          { name: "子谦", source: "《诗经》", meaning: "谦谦君子，温润如玉；谦虚谨慎，品德高尚。" },
+          { name: "思远", source: "《楚辞》", meaning: "思虑深远，志向远大；心怀远大志向，目光长远。" },
+          { name: "浩然", source: "《孟子》", meaning: "浩然正气，天地同在；正气凛然，如天地般博大。" },
+          { name: "子墨", source: "《诗经》", meaning: "文房四宝，书香门第；文化底蕴深厚，才华横溢。" },
+          { name: "子涵", source: "《楚辞》", meaning: "涵养深厚，品德高尚；内涵丰富，品格高尚。" },
+          { name: "思源", source: "《诗经》", meaning: "饮水思源，不忘初心；懂得感恩，不忘初心。" },
+          { name: "浩宇", source: "《楚辞》", meaning: "胸怀宇宙，浩然正气；心胸宽广，正气凛然。" },
+          { name: "子轩", source: "《论语》", meaning: "气宇轩昂，才华横溢；气度不凡，才华出众。" },
+          { name: "嘉泽", source: "《诗经》", meaning: "嘉言懿行，恩泽绵长；言行美好，福泽深厚。" },
+          { name: "博文", source: "《论语》", meaning: "博学多才，文质彬彬；学识渊博，文雅有礼。" },
+          { name: "弘毅", source: "《论语》", meaning: "弘大刚毅，志向远大；意志坚定，胸怀宽广。" },
+          { name: "子谦", source: "《诗经》", meaning: "谦谦君子，温润如玉；谦虚谨慎，品德高尚。" },
+          { name: "思远", source: "《楚辞》", meaning: "思虑深远，志向远大；心怀远大志向，目光长远。" }
+        ],
+        modern: [
+          { name: "昱宁", source: "《易经》", meaning: "昱照心宁，内外澄明；光明照耀，内心宁静，表里如一。" },
+          { name: "辰安", source: "《楚辞》", meaning: "星辰璀璨，平安顺遂；如星辰般闪耀，一生平安。" },
+          { name: "亦辰", source: "《诗经》", meaning: "亦步亦趋，星辰指引；追随星辰，勇往直前。" },
+          { name: "俊辰", source: "《论语》", meaning: "俊才星驰，时光正好；才华横溢，生逢其时。" },
+          { name: "浩然", source: "《孟子》", meaning: "浩然正气，天地同在；正气凛然，如天地般博大。" },
+          { name: "宇泽", source: "《楚辞》", meaning: "胸怀宇宙，恩泽四方；心胸宽广，福泽众人。" },
+          { name: "明轩", source: "《论语》", meaning: "光明磊落，气宇轩昂；性格开朗，气度不凡。" },
+          { name: "文轩", source: "《论语》", meaning: "文质彬彬，气宇轩昂；文雅有礼，气度不凡。" },
+          { name: "浩然", source: "《孟子》", meaning: "浩然正气，天地同在；正气凛然，如天地般博大。" },
+          { name: "子轩", source: "《论语》", meaning: "气宇轩昂，才华横溢；气度不凡，才华出众。" },
+          { name: "宇轩", source: "《楚辞》", meaning: "气宇轩昂，胸怀宇宙；气度不凡，胸怀宽广。" },
+          { name: "泽宇", source: "《易经》", meaning: "恩泽广布，宇宙胸怀；心怀宇宙，恩泽众人。" },
+          { name: "明轩", source: "《论语》", meaning: "光明磊落，气宇轩昂；性格开朗，气度不凡。" },
+          { name: "浩宇", source: "《楚辞》", meaning: "胸怀宇宙，浩然正气；心胸宽广，正气凛然。" },
+          { name: "子涵", source: "《楚辞》", meaning: "涵养深厚，品德高尚；内涵丰富，品格高尚。" },
+          { name: "思涵", source: "《楚辞》", meaning: "心思细腻，涵养深厚；心思温柔，内涵丰富。" },
+          { name: "文轩", source: "《论语》", meaning: "文质彬彬，气宇轩昂；文雅有礼，气度不凡。" },
+          { name: "浩然", source: "《孟子》", meaning: "浩然正气，天地同在；正气凛然，如天地般博大。" },
+          { name: "子轩", source: "《论语》", meaning: "气宇轩昂，才华横溢；气度不凡，才华出众。" },
+          { name: "宇轩", source: "《楚辞》", meaning: "气宇轩昂，胸怀宇宙；气度不凡，胸怀宽广。" },
+          { name: "泽宇", source: "《易经》", meaning: "恩泽广布，宇宙胸怀；心怀宇宙，恩泽众人。" },
+          { name: "明轩", source: "《论语》", meaning: "光明磊落，气宇轩昂；性格开朗，气度不凡。" },
+          { name: "浩宇", source: "《楚辞》", meaning: "胸怀宇宙，浩然正气；心胸宽广，正气凛然。" },
+          { name: "子涵", source: "《楚辞》", meaning: "涵养深厚，品德高尚；内涵丰富，品格高尚。" },
+          { name: "思涵", source: "《楚辞》", meaning: "心思细腻，涵养深厚；心思温柔，内涵丰富。" },
+          { name: "文轩", source: "《论语》", meaning: "文质彬彬，气宇轩昂；文雅有礼，气度不凡。" },
+          { name: "浩然", source: "《孟子》", meaning: "浩然正气，天地同在；正气凛然，如天地般博大。" },
+          { name: "子轩", source: "《论语》", meaning: "气宇轩昂，才华横溢；气度不凡，才华出众。" },
+          { name: "宇轩", source: "《楚辞》", meaning: "气宇轩昂，胸怀宇宙；气度不凡，胸怀宽广。" },
+          { name: "泽宇", source: "《易经》", meaning: "恩泽广布，宇宙胸怀；心怀宇宙，恩泽众人。" },
+          { name: "明轩", source: "《论语》", meaning: "光明磊落，气宇轩昂；性格开朗，气度不凡。" }
+        ],
+        poetic: [
+          { name: "景琛", source: "《唐诗》", meaning: "景星瑞云，琛玉无瑕；如景星瑞云般吉祥，如美玉般珍贵。" },
+          { name: "沐宸", source: "《宋词》", meaning: "沐浴皇恩，气宇轩昂；受恩泽庇佑，气度不凡。" },
+          { name: "奕恒", source: "《易经》", meaning: "神采奕奕，持之以恒；精神饱满，坚持不懈。" },
+          { name: "皓轩", source: "《唐诗》", meaning: "皓月当空，气宇轩昂；如皓月般光明，气度非凡。" },
+          { name: "星宇", source: "《诗经》", meaning: "星辰宇宙，浩瀚无垠；如星辰般闪耀，胸怀宇宙。" },
+          { name: "梦华", source: "《诗经》", meaning: "梦中繁华，美好如画；如梦中的繁华般美好。" },
+          { name: "星河", source: "《楚辞》", meaning: "星辰如河，浩瀚无垠；如星河般浩瀚，胸怀宽广。" },
+          { name: "月华", source: "《诗经》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" },
+          { name: "星远", source: "《楚辞》", meaning: "星辰遥远，志向高远；如星辰般遥远，志向高远。" },
+          { name: "梦远", source: "《诗经》", meaning: "梦中远方，志向远大；如梦中的远方般美好。" },
+          { name: "星月", source: "《楚辞》", meaning: "星辰明月，相映成辉；如星辰明月般美好闪耀。" },
+          { name: "月华", source: "《诗经》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" },
+          { name: "星柔", source: "《楚辞》", meaning: "星辰温柔，柔情似水；如星辰般温柔，柔情似水。" },
+          { name: "梦华", source: "《诗经》", meaning: "梦中繁华，美好如画；如梦中的繁华般美好。" },
+          { name: "星宇", source: "《楚辞》", meaning: "星辰宇宙，浩瀚无垠；如星辰般闪耀，胸怀宇宙。" },
+          { name: "梦河", source: "《诗经》", meaning: "梦中星河，浩瀚无垠；如梦中的星河般浩瀚。" },
+          { name: "星华", source: "《楚辞》", meaning: "星辰光华，灿烂辉煌；如星辰般闪耀，光芒四射。" },
+          { name: "月华", source: "《诗经》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" },
+          { name: "星远", source: "《楚辞》", meaning: "星辰遥远，志向高远；如星辰般遥远，志向高远。" },
+          { name: "梦远", source: "《诗经》", meaning: "梦中远方，志向远大；如梦中的远方般美好。" },
+          { name: "星月", source: "《楚辞》", meaning: "星辰明月，相映成辉；如星辰明月般美好闪耀。" },
+          { name: "月华", source: "《诗经》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" },
+          { name: "星柔", source: "《楚辞》", meaning: "星辰温柔，柔情似水；如星辰般温柔，柔情似水。" },
+          { name: "梦华", source: "《诗经》", meaning: "梦中繁华，美好如画；如梦中的繁华般美好。" },
+          { name: "星宇", source: "《楚辞》", meaning: "星辰宇宙，浩瀚无垠；如星辰般闪耀，胸怀宇宙。" },
+          { name: "梦河", source: "《诗经》", meaning: "梦中星河，浩瀚无垠；如梦中的星河般浩瀚。" },
+          { name: "星华", source: "《楚辞》", meaning: "星辰光华，灿烂辉煌；如星辰般闪耀，光芒四射。" },
+          { name: "月华", source: "《诗经》", meaning: "月华如练，皎洁美好；如月光般皎洁美好。" },
+          { name: "星远", source: "《楚辞》", meaning: "星辰遥远，志向高远；如星辰般遥远，志向高远。" }
+        ]
+      }
+    };
+
+    // 3. 生成名字（根据日期和姓氏动态匹配）
+    function generateNames() {
+      const surname = document.getElementById("surname").value.trim();
+      const gender = document.getElementById("gender").value;
+      const style = document.getElementById("style").value;
+      const birthDate = document.getElementById("birthDate").value;
+
+      if (!surname) {
+        alert("请输入宝宝姓氏～");
+        return;
+      }
+
+      // 获取对应性别和风格的名字库
+      let filteredNames = [...nameDatabase[gender][style]];
+      
+      // 根据出生日期排序和打分（不做过滤）
+      filteredNames = sortAndScoreNamesByDate(filteredNames, birthDate);
+      
+      // 确保至少显示8个名字，如果不够就从其他风格补充
+      if (filteredNames.length < 8) {
+        const otherStyles = Object.keys(nameDatabase[gender]).filter(s => s !== style);
+        for (const otherStyle of otherStyles) {
+          if (filteredNames.length >= 8) break;
+          const additionalNames = nameDatabase[gender][otherStyle];
+          const scored = sortAndScoreNamesByDate([...additionalNames], birthDate);
+          filteredNames = [...filteredNames, ...scored];
+        }
+      }
+
+      const nameList = document.getElementById("nameList");
+      nameList.innerHTML = "";
+
+      // 生成带评分的名字卡片（90-98分，分数也会根据日期变化）
+      filteredNames.forEach(nameData => {
+        // 根据日期和姓氏生成一致的分数
+        const score = generateConsistentScore(nameData.name, surname, birthDate);
+        const nameCard = document.createElement("div");
+        nameCard.className = "name-card";
+        nameCard.innerHTML = `
+          <div class="card-header">
+            <span class="name-text">${surname}${nameData.name}</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="score-tag">${score}分</span>
+            </div>
+          </div>
+          <div class="source-tag">${nameData.source}</div>
+          <div class="meaning-area">
+            <div class="meaning-text">${nameData.meaning}</div>
+          </div>
+          <button class="collect-btn" onclick="collectName(this)">♡</button>
+        `;
+        nameList.appendChild(nameCard);
+      });
+
+      // 显示结果区
+      document.getElementById("resultArea").style.display = "block";
+    }
+
+    // 根据出生日期排序和打分名字（不做过滤，确保显示所有名字）
+    function sortAndScoreNamesByDate(names, birthDate) {
+      if (!birthDate) {
+        return shuffleArray([...names]);
+      }
+
+      const date = new Date(birthDate);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const year = date.getFullYear();
+      
+      // 根据生肖
+      const zodiac = getZodiac(year);
+      // 根据季节
+      const season = getSeason(month);
+      // 根据五行（简化版）
+      const element = getElement(month, day);
+
+      // 给每个名字打分（只是排序依据，不做过滤）
+      const scoredNames = names.map(nameData => {
+        let score = 0;
+        
+        // 根据来源匹配加分
+        if (nameData.source.includes(zodiac)) score += 3;
+        if (nameData.meaning.includes(getSeasonKeyword(season))) score += 2;
+        if (nameData.meaning.includes(getElementKeyword(element))) score += 2;
+        
+        // 根据名字汉字含义匹配
+        if (nameData.meaning.includes("雨") && season === "spring") score += 2;
+        if (nameData.meaning.includes("雪") && season === "winter") score += 2;
+        if (nameData.meaning.includes("月") && (day >= 15)) score += 1;
+        
+        return { ...nameData, matchScore: score };
+      });
+
+      // 按分数排序（高分优先），分数相同的随机
+      scoredNames.sort((a, b) => b.matchScore - a.matchScore);
+      
+      return scoredNames;
+    }
+
+    // 生成一致的分数（同一天同一个名字分数相同）
+    function generateConsistentScore(nameStr, surname, birthDate) {
+      if (!birthDate) return Math.floor(Math.random() * 9) + 90;
+      
+      const date = new Date(birthDate);
+      const seed = date.getMonth() * 10000 + date.getDate() * 100 + date.getFullYear();
+      const nameSum = (nameStr + surname).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      
+      const baseScore = 90 + (seed % 6) + (nameSum % 3);
+      return Math.min(baseScore, 98);
+    }
+
+    // 获取生肖
+    function getZodiac(year) {
+      const zodiacs = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+      return zodiacs[(year - 4) % 12];
+    }
+
+    // 获取季节
+    function getSeason(month) {
+      if (month >= 3 && month <= 5) return "spring";
+      if (month >= 6 && month <= 8) return "summer";
+      if (month >= 9 && month <= 11) return "autumn";
+      return "winter";
+    }
+
+    // 获取季节关键词
+    function getSeasonKeyword(season) {
+      const keywords = {
+        spring: ["春", "雨", "芽", "生", "花"],
+        summer: ["夏", "阳", "热", "盛", "茂"],
+        autumn: ["秋", "金", "风", "收", "硕"],
+        winter: ["冬", "雪", "寒", "梅", "白"]
+      };
+      return keywords[season].join("|");
+    }
+
+    // 获取五行（简化版）
+    function getElement(month, day) {
+      if ((month === 3 && day >= 21) || (month === 4) || (month === 5 && day <= 20)) return "wood";
+      if ((month === 5 && day >= 21) || (month === 6) || (month === 7 && day <= 22)) return "fire";
+      if ((month === 7 && day >= 23) || (month === 8) || (month === 9 && day <= 22)) return "earth";
+      if ((month === 9 && day >= 23) || (month === 10) || (month === 11 && day <= 21)) return "gold";
+      return "water";
+    }
+
+    // 获取五行关键词
+    function getElementKeyword(element) {
+      const keywords = {
+        wood: ["木", "林", "森", "树", "青"],
+        fire: ["火", "阳", "红", "热", "明"],
+        earth: ["土", "山", "石", "地", "黄"],
+        gold: ["金", "玉", "宝", "珍", "白"],
+        water: ["水", "雨", "雪", "冰", "蓝"]
+      };
+      return keywords[element].join("|");
+    }
+
+    // 根据种子打乱数组
+    function shuffleBySeed(array, seed) {
+      const result = [...array];
+      const random = sfc32(seed);
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    // 简单的伪随机数生成器
+    function sfc32(a) {
+      return function() {
+        a |= 0;
+        a = a + 0x9E3779B9 | 0;
+        let t = a ^ a >>> 16;
+        t = Math.imul(t, 0x21F0AAAD);
+        t = t ^ t >>> 15;
+        t = Math.imul(t, 0x735A2D97);
+        return ((t = t ^ t >>> 15) >>> 0) / 4294967296;
+      };
+    }
+
+    // 普通随机打乱
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // 4. 收藏功能
+    let favorites = [];
+
+    function collectName(btn) {
+      const card = btn.closest('.name-card');
+      const nameText = card.querySelector('.name-text').textContent;
+      const source = card.querySelector('.source-tag').textContent;
+      const meaning = card.querySelector('.meaning-text').textContent;
+      const score = card.querySelector('.score-tag').textContent;
+
+      btn.classList.toggle("collected");
+
+      if (btn.classList.contains("collected")) {
+        btn.innerHTML = "❤";
+        // 添加到收藏
+        if (!favorites.some(f => f.name === nameText)) {
+          favorites.push({ name: nameText, source, meaning, score });
+        }
+      } else {
+        btn.innerHTML = "♡";
+        // 从收藏中移除
+        favorites = favorites.filter(f => f.name !== nameText);
+      }
+
+      renderFavorites();
+    }
+
+    // 渲染收藏列表
+    function renderFavorites() {
+      const favoritesList = document.getElementById("favoritesList");
+      const favoritesCount = document.getElementById("favoritesCount");
+      const favoritesArea = document.getElementById("favoritesArea");
+
+      favoritesCount.textContent = `已收藏 ${favorites.length} 个名字`;
+
+      if (favorites.length === 0) {
+        favoritesArea.classList.remove("show");
+        return;
+      }
+
+      favoritesArea.classList.add("show");
+      favoritesList.innerHTML = "";
+
+      favorites.forEach(item => {
+        const favCard = document.createElement("div");
+        favCard.className = "name-card";
+        favCard.innerHTML = `
+          <div class="card-header">
+            <span class="name-text">${item.name}</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="score-tag">${item.score}</span>
+            </div>
+          </div>
+          <div class="source-tag">${item.source}</div>
+          <div class="meaning-area">
+            <div class="meaning-text">${item.meaning}</div>
+          </div>
+          <button class="delete-btn" onclick="removeFavorite('${item.name}')">删除</button>
+        `;
+        favoritesList.appendChild(favCard);
+      });
+    }
+
+    // 删除收藏
+    function removeFavorite(name) {
+      favorites = favorites.filter(f => f.name !== name);
+      renderFavorites();
+      
+      // 更新主列表中的收藏状态
+      const mainListCards = document.querySelectorAll('#nameList .name-card');
+      mainListCards.forEach(card => {
+        const nameText = card.querySelector('.name-text').textContent;
+        if (nameText === name) {
+          const btn = card.querySelector('.collect-btn');
+          btn.classList.remove("collected");
+          btn.innerHTML = "♡";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
