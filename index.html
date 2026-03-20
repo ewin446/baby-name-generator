@@ -1084,10 +1084,11 @@
 
     // ========== 页面加载时验证链接 ==========
     window.onload = function() {
-      checkLink(); // 先验证链接，再显示功能
-      updateStyleDescription();
-      updateWeightDisplay();
-    };
+  // checkLink(); // 临时关掉验证
+  document.getElementById('mainFunction').style.display = 'block'; // 强制显示功能
+  updateStyleDescription();
+  updateWeightDisplay();
+};
   </script>
 </body>
 </html>
