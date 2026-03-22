@@ -3,9 +3,273 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>宝宝取名智能定制系统 | 500套高分好名</title>
-  <!-- 移除冲突的 preload，直接引入样式 -->
-  <link rel="stylesheet" href="./css/style.css">
+  <title>宝宝取名智能定制系统</title>
+  <!-- 彻底移除所有preload标签，消除配置冲突 -->
+  <style>
+    /* 内置核心样式，避免依赖外部CSS（可选，确保样式正常） */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft Yahei", sans-serif;
+    }
+    body {
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .main-title {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .sub-title {
+      color: #666;
+      font-size: 16px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .style-desc {
+      margin-top: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+    .advanced-toggle {
+      margin: 15px 0;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #333;
+      font-weight: 500;
+    }
+    .advanced-settings {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .weight-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .weight-item input {
+      width: 60%;
+    }
+    .reset-btn {
+      padding: 8px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .count-selector {
+      margin: 20px 0;
+    }
+    .count-label, .filter-label {
+      margin-right: 10px;
+      color: #333;
+    }
+    .count-btn, .filter-btn {
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-right: 10px;
+      cursor: pointer;
+      background: white;
+    }
+    .count-btn.active, .filter-btn.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .generate-btn {
+      width: 100%;
+      padding: 15px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      cursor: pointer;
+      margin: 20px 0;
+    }
+    .result-area, .favorites-area {
+      margin-top: 30px;
+      display: none;
+    }
+    .result-title, .favorites-title {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+    .filter-area {
+      margin-bottom: 20px;
+    }
+    .name-list, .favorites-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .name-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .name-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+    .score-tag {
+      background: #ffc107;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .source-tag {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .meaning-text {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .collect-btn {
+      margin-top: 10px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #eee;
+      font-size: 16px;
+    }
+    .collect-btn.collected {
+      background: #dc3545;
+      color: white;
+    }
+    .delete-btn {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 999;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #fff;
+      border-top: 5px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: white;
+      font-size: 18px;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+    }
+    .close-btn {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .footer-link {
+      margin: 0 10px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .empty-favorites {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+      grid-column: 1 / -1;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -103,8 +367,8 @@
         <button class="filter-btn" onclick="filterByScore('90-94', this)">90-94分</button>
       </div>
       
-      <!-- 名字列表（简化虚拟列表，适配静态环境） -->
-      <div id="nameList" class="name-list" style="max-height: 400px; overflow-y: auto;"></div>
+      <!-- 名字列表 -->
+      <div id="nameList" class="name-list"></div>
     </div>
 
     <!-- 收藏区域 -->
@@ -125,13 +389,13 @@
   </div>
 
   <!-- 加载动画 -->
-  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+  <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
     <div class="loading-text">正在为您生成个性化好名字...</div>
   </div>
 
   <!-- 模态框 -->
-  <div class="modal" id="privacyModal" style="display: none;">
+  <div class="modal" id="privacyModal">
     <div class="modal-content">
       <span class="close-btn" onclick="hideModal('privacyModal')">&times;</span>
       <h3>隐私政策</h3>
@@ -141,7 +405,7 @@
     </div>
   </div>
 
-  <div class="modal" id="termsModal" style="display: none;">
+  <div class="modal" id="termsModal">
     <div class="modal-content">
       <span class="close-btn" onclick="hideModal('termsModal')">&times;</span>
       <h3>使用条款</h3>
@@ -151,7 +415,7 @@
     </div>
   </div>
 
-  <div class="modal" id="aboutModal" style="display: none;">
+  <div class="modal" id="aboutModal">
     <div class="modal-content">
       <span class="close-btn" onclick="hideModal('aboutModal')">&times;</span>
       <h3>关于我们</h3>
@@ -160,44 +424,9 @@
     </div>
   </div>
 
-  <!-- 直接引入工具类和名字数据库，放弃懒加载（适配静态环境） -->
-  <script src="./js/name-db.js"></script>
-  <script src="./js/lazy-utils.js"></script>
   <script>
-    // 全局变量初始化
-    let selectedCount = 10;
-    let allGeneratedNames = [];
-    let favorites = JSON.parse(localStorage.getItem('nameFavorites')) || [];
-    window.selectedSurname = '';
-    window.favorites = favorites;
-    // 全局工具类（简化，避免模块导入问题）
-    window.lazyUtils = {
-      // 简化的名字渲染（移除虚拟列表，适配静态环境）
-      renderNameCard: function(nameObj, container) {
-        const fullname = `${window.selectedSurname}${nameObj.name}`;
-        const score = nameObj.score || Math.floor(Math.random() * 9) + 90;
-        const isCollected = window.favorites?.some(f => f.fullname === fullname) || false;
-        
-        const nameCard = document.createElement('div');
-        nameCard.className = 'name-card';
-        nameCard.innerHTML = `
-          <div class="card-header">
-            <span class="name-text">${fullname}</span>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="score-tag">${score}分</span>
-            </div>
-          </div>
-          <div class="source-tag">${nameObj.source}</div>
-          <div class="meaning-area">
-            <div class="meaning-text">${nameObj.meaning}</div>
-          </div>
-          <button class="collect-btn ${isCollected ? 'collected' : ''}" 
-                  onclick="window.collectName(this, '${fullname}', '${nameObj.source}', '${nameObj.meaning}', ${score})">
-            ${isCollected ? '❤' : '♡'}
-          </button>
-        `;
-        container.appendChild(nameCard);
-      },
+    // 1. 内置核心工具类（彻底移除外部JS依赖）
+    const lazyUtils = {
       // 加载动画
       showLoading: function() {
         document.getElementById('loadingOverlay').style.display = 'flex';
@@ -205,32 +434,104 @@
       hideLoading: function() {
         document.getElementById('loadingOverlay').style.display = 'none';
       },
-      // 简化的列表渲染（移除虚拟滚动）
+      // 渲染名字卡片
+      renderNameCard: function(nameObj, container) {
+        const fullname = `${window.selectedSurname}${nameObj.name}`;
+        const score = nameObj.score;
+        const isCollected = window.favorites.some(f => f.fullname === fullname);
+        
+        const nameCard = document.createElement('div');
+        nameCard.className = 'name-card';
+        nameCard.innerHTML = `
+          <div class="card-header">
+            <span class="name-text">${fullname}</span>
+            <span class="score-tag">${score}分</span>
+          </div>
+          <div class="source-tag">${nameObj.source}</div>
+          <div class="meaning-area">
+            <div class="meaning-text">${nameObj.meaning}</div>
+          </div>
+          <button class="collect-btn ${isCollected ? 'collected' : ''}" 
+                  onclick="collectName(this, '${fullname}', '${nameObj.source}', '${nameObj.meaning}', ${score})">
+            ${isCollected ? '❤' : '♡'}
+          </button>
+        `;
+        container.appendChild(nameCard);
+      },
+      // 渲染名字列表
       renderVirtualList: function(container, names) {
         container.innerHTML = '';
-        names.forEach(name => {
-          this.renderNameCard(name, container);
-        });
+        names.forEach(name => this.renderNameCard(name, container));
       }
     };
 
-    // 数量选择
-    function selectCount(count, btn) {
-      selectedCount = count;
-      document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
+    // 2. 全局变量初始化
+    let selectedCount = 10;
+    let allGeneratedNames = [];
+    window.selectedSurname = '';
+    // 收藏数据（本地存储）
+    window.favorites = JSON.parse(localStorage.getItem('nameFavorites')) || [];
 
+    // 3. 内置名字数据库（无需外部name-db.js）
+    const nameDatabase = {
+      girl: {
+        classical: [
+          { name: "婉清", source: "《诗经·郑风》", meaning: "温婉清丽，如清风拂面，寓意女子温柔贤淑，容貌秀丽" },
+          { name: "静姝", source: "《诗经·邶风》", meaning: "静女其姝，寓意女子安静美好，品德端庄" },
+          { name: "采薇", source: "《诗经·小雅》", meaning: "采薇采薇，薇亦作止，寓意女子坚韧不拔，品性高洁" },
+          { name: "思悠", source: "《诗经·郑风》", meaning: "青青子衿，悠悠我思，寓意女子心思细腻，温婉悠长" },
+          { name: "清芷", source: "《楚辞·九歌》", meaning: "芷兰之香，清芬袭人，寓意女子品性高洁，气质如兰" }
+        ],
+        modern: [
+          { name: "一诺", source: "现代起名美学", meaning: "一诺千金，寓意女子诚实守信，言出必行" },
+          { name: "语桐", source: "现代起名美学", meaning: "语笑嫣然，桐木常青，寓意女子活泼开朗，生命力旺盛" },
+          { name: "梓萱", source: "现代起名美学", meaning: "梓木成材，萱草忘忧，寓意女子茁壮成长，快乐无忧" },
+          { name: "欣怡", source: "现代起名美学", meaning: "欣喜愉悦，寓意女子生活幸福，心情舒畅" },
+          { name: "若溪", source: "现代起名美学", meaning: "宛若溪流，清澈灵动，寓意女子纯净自然，活泼灵动" }
+        ],
+        poetic: [
+          { name: "诗涵", source: "唐诗宋词", meaning: "诗情画意，涵养深厚，寓意女子富有才情，气质优雅" },
+          { name: "梦蝶", source: "《庄子·齐物论》", meaning: "庄生晓梦迷蝴蝶，寓意女子梦幻美好，自由洒脱" },
+          { name: "落雁", source: "《汉书》", meaning: "沉鱼落雁，寓意女子容貌绝美，倾国倾城" },
+          { name: "江雪", source: "《江雪》柳宗元", meaning: "孤舟蓑笠翁，独钓寒江雪，寓意女子清冷孤傲，品性高洁" },
+          { name: "星垂", source: "《旅夜书怀》杜甫", meaning: "星垂平野阔，月涌大江流，寓意女子心胸开阔，前程似锦" }
+        ]
+      },
+      boy: {
+        classical: [
+          { name: "子谦", source: "《论语》", meaning: "君子谦谦，卑以自牧，寓意男子谦逊有礼，品德高尚" },
+          { name: "修远", source: "《楚辞·离骚》", meaning: "路漫漫其修远兮，吾将上下而求索，寓意男子追求远大，坚持不懈" },
+          { name: "景行", source: "《诗经·小雅》", meaning: "高山仰止，景行行止，寓意男子品行高尚，令人敬仰" },
+          { name: "博文", source: "《论语》", meaning: "博学于文，约之以礼，寓意男子学识渊博，知书达理" },
+          { name: "怀瑾", source: "《楚辞·九章》", meaning: "怀瑾握瑜兮，穷不知所示，寓意男子身怀美玉，品德高尚" }
+        ],
+        modern: [
+          { name: "浩然", source: "现代起名美学", meaning: "浩然正气，寓意男子胸怀坦荡，一身正气" },
+          { name: "宇辰", source: "现代起名美学", meaning: "气宇轩昂，星辰大海，寓意男子心胸开阔，前程远大" },
+          { name: "泽宇", source: "现代起名美学", meaning: "恩泽万物，气宇不凡，寓意男子善良宽厚，风度翩翩" },
+          { name: "俊熙", source: "现代起名美学", meaning: "英俊潇洒，熙光普照，寓意男子相貌堂堂，前途光明" },
+          { name: "奕辰", source: "现代起名美学", meaning: "神采奕奕，星辰闪耀，寓意男子精神饱满，光芒四射" }
+        ],
+        poetic: [
+          { name: "临风", source: "《滕王阁序》", meaning: "雄州雾列，俊采星驰，爽籁发而清风生，纤歌凝而白云遏，寓意男子风度翩翩，气宇轩昂" },
+          { name: "惊鸿", source: "《洛神赋》", meaning: "翩若惊鸿，婉若游龙，寓意男子身姿矫健，气质不凡" },
+          { name: "望舒", source: "《楚辞·离骚》", meaning: "前望舒使先驱兮，后飞廉使奔属，寓意男子如月光般温柔，前程光明" },
+          { name: "飞帆", source: "《行路难》李白", meaning: "长风破浪会有时，直挂云帆济沧海，寓意男子勇往直前，志向远大" },
+          { name: "松涛", source: "《山居秋暝》王维", meaning: "明月松间照，清泉石上流，寓意男子如青松般坚韧，气势如涛" }
+        ]
+      }
+    };
+
+    // 4. 辅助函数
     // 更新风格描述
     function updateStyleDescription() {
       const style = document.getElementById('style').value;
-      const descElement = document.getElementById('styleDescription');
-      const descriptions = {
+      const descMap = {
         classical: '古典文雅：源自诗词典籍，如《诗经》《楚辞》，典雅高贵，适合书香门第',
         modern: '简约现代：简洁明快，朗朗上口，符合现代审美，时尚大气',
         poetic: '诗意文艺：充满诗意和文艺气息，优雅脱俗，富有浪漫情怀'
       };
-      descElement.textContent = descriptions[style];
+      document.getElementById('styleDescription').textContent = descMap[style];
     }
 
     // 切换高级设置
@@ -265,113 +566,72 @@
       updateWeightDisplay();
     }
 
+    // 选择生成数量
+    function selectCount(count, btn) {
+      selectedCount = count;
+      document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
     // 评分筛选
     function filterByScore(range, btn) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
-      const nameList = document.getElementById('nameList');
-      let filteredNames = [];
+      let filtered = [];
       if (range === 'all') {
-        filteredNames = allGeneratedNames;
+        filtered = allGeneratedNames;
       } else {
         const [min, max] = range.split('-').map(Number);
-        filteredNames = allGeneratedNames.filter(name => {
-          let score = name.score;
-          if (typeof score === 'string') {
-            score = parseInt(score.replace(/[^0-9]/g, ''));
-          }
-          return score >= min && score <= max;
-        });
+        filtered = allGeneratedNames.filter(n => n.score >= min && n.score <= max);
       }
       
-      window.lazyUtils.renderVirtualList(nameList, filteredNames);
+      lazyUtils.renderVirtualList(document.getElementById('nameList'), filtered);
     }
 
     // 模态框操作
     function showModal(modalId) {
       document.getElementById(modalId).style.display = 'flex';
     }
-    
     function hideModal(modalId) {
       document.getElementById(modalId).style.display = 'none';
     }
 
-    // 生成名字（简化懒加载，直接调用本地数据库）
-    function generateNames() {
-      const surname = document.getElementById('surname').value.trim();
-      const birthDate = document.getElementById('birthDate').value;
-      const gender = document.getElementById('gender').value;
-      const style = document.getElementById('style').value;
-      
-      if (!surname) {
-        alert('请输入宝宝姓氏！');
-        return;
-      }
-      
-      window.selectedSurname = surname;
-      window.lazyUtils.showLoading();
-
-      try {
-        // 直接调用名字数据库，无需异步导入
-        let names = getFilteredNames(surname, gender, style);
-        
-        // 截取指定数量
-        names = names.slice(0, selectedCount);
-        allGeneratedNames = names.map(name => ({
-          ...name,
-          fullname: `${surname}${name.name}`,
-          score: Math.floor(Math.random() * 9) + 90
-        }));
-
-        // 显示结果并渲染列表
-        const resultArea = document.getElementById('resultArea');
-        resultArea.style.display = 'block';
-        const nameList = document.getElementById('nameList');
-        window.lazyUtils.renderVirtualList(nameList, allGeneratedNames);
-
-        // 更新收藏区
-        updateFavoritesArea();
-      } catch (e) {
-        console.error('生成名字失败：', e);
-        alert('生成名字失败，请重试！');
-      } finally {
-        window.lazyUtils.hideLoading();
-      }
-    }
-
-    // 收藏功能（全局）
-    window.collectName = function(btn, fullname, source, meaning, score) {
+    // 收藏功能
+    function collectName(btn, fullname, source, meaning, score) {
       const isCollected = btn.classList.contains('collected');
       if (isCollected) {
-        favorites = favorites.filter(f => f.fullname !== fullname);
+        // 取消收藏
+        window.favorites = window.favorites.filter(f => f.fullname !== fullname);
         btn.classList.remove('collected');
         btn.innerHTML = '♡';
       } else {
-        favorites.push({ fullname, source, meaning, score });
+        // 添加收藏
+        window.favorites.push({ fullname, source, meaning, score });
         btn.classList.add('collected');
         btn.innerHTML = '❤';
       }
-      localStorage.setItem('nameFavorites', JSON.stringify(favorites));
+      // 保存到本地存储
+      localStorage.setItem('nameFavorites', JSON.stringify(window.favorites));
       updateFavoritesArea();
-    };
+    }
 
-    // 更新收藏区
+    // 更新收藏区域
     function updateFavoritesArea() {
-      const favoritesArea = document.getElementById('favoritesArea');
-      const favoritesCount = document.getElementById('favoritesCount');
-      const favoritesList = document.getElementById('favoritesList');
+      const favArea = document.getElementById('favoritesArea');
+      const favCount = document.getElementById('favoritesCount');
+      const favList = document.getElementById('favoritesList');
       
-      favoritesArea.style.display = favorites.length > 0 ? 'block' : 'none';
-      favoritesCount.textContent = `已收藏 ${favorites.length} 个名字`;
+      favArea.style.display = window.favorites.length > 0 ? 'block' : 'none';
+      favCount.textContent = `已收藏 ${window.favorites.length} 个名字`;
       
-      favoritesList.innerHTML = '';
-      if (favorites.length === 0) {
-        favoritesList.innerHTML = '<div class="empty-favorites">暂无收藏的名字</div>';
+      favList.innerHTML = '';
+      if (window.favorites.length === 0) {
+        favList.innerHTML = '<div class="empty-favorites">暂无收藏的名字</div>';
         return;
       }
       
-      favorites.forEach(item => {
+      window.favorites.forEach(item => {
         const card = document.createElement('div');
         card.className = 'name-card';
         card.innerHTML = `
@@ -385,28 +645,76 @@
           </div>
           <button class="delete-btn" onclick="deleteFavorite('${item.fullname}')">删除</button>
         `;
-        favoritesList.appendChild(card);
+        favList.appendChild(card);
       });
     }
 
     // 删除收藏
-    window.deleteFavorite = function(fullname) {
-      favorites = favorites.filter(f => f.fullname !== fullname);
-      localStorage.setItem('nameFavorites', JSON.stringify(favorites));
+    function deleteFavorite(fullname) {
+      window.favorites = window.favorites.filter(f => f.fullname !== fullname);
+      localStorage.setItem('nameFavorites', JSON.stringify(window.favorites));
       updateFavoritesArea();
+      // 更新名字列表中的收藏按钮状态
       document.querySelectorAll('.collect-btn').forEach(btn => {
         if (btn.getAttribute('onclick').includes(fullname)) {
           btn.classList.remove('collected');
           btn.innerHTML = '♡';
         }
       });
-    };
+    }
 
-    // 页面初始化
-    window.addEventListener('DOMContentLoaded', function() {
+    // 5. 核心生成名字函数（无异步、无外部依赖）
+    function generateNames() {
+      // 获取输入值
+      const surname = document.getElementById('surname').value.trim();
+      const gender = document.getElementById('gender').value;
+      const style = document.getElementById('style').value;
+      
+      // 校验姓氏
+      if (!surname) {
+        alert('请输入宝宝姓氏！');
+        return;
+      }
+      
+      // 初始化全局姓氏
+      window.selectedSurname = surname;
+      
+      // 显示加载动画
+      lazyUtils.showLoading();
+      
+      try {
+        // 从内置数据库获取名字
+        const rawNames = nameDatabase[gender][style];
+        // 生成随机评分 + 截取指定数量
+        allGeneratedNames = rawNames.slice(0, selectedCount).map(name => ({
+          ...name,
+          score: Math.floor(Math.random() * 9) + 90 // 90-98分随机
+        }));
+        
+        // 显示结果区域 + 渲染名字列表
+        const resultArea = document.getElementById('resultArea');
+        resultArea.style.display = 'block';
+        lazyUtils.renderVirtualList(document.getElementById('nameList'), allGeneratedNames);
+        
+        // 更新收藏区域
+        updateFavoritesArea();
+      } catch (e) {
+        console.error('生成名字失败：', e);
+        alert('生成名字失败，请重试！');
+      } finally {
+        // 隐藏加载动画
+        lazyUtils.hideLoading();
+      }
+    }
+
+    // 6. 页面初始化
+    window.onload = function() {
       updateStyleDescription();
+      updateWeightDisplay();
       updateFavoritesArea();
-    });
+      // 初始化加载动画为隐藏
+      document.getElementById('loadingOverlay').style.display = 'none';
+    };
   </script>
 </body>
 </html>
