@@ -3,185 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>宝宝取名系统</title>
+  <title>宝宝取名测试版（带评分筛选）</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Microsoft Yahei", sans-serif;
+    body { padding: 20px; font-family: Arial; }
+    .box { max-width: 500px; margin: 0 auto; }
+    input, select { width: 100%; padding: 8px; margin: 10px 0; box-sizing: border-box; }
+    button { padding: 10px; border: none; cursor: pointer; color: white; }
+    .generate-btn { width: 100%; background: green; margin: 10px 0; }
+    .filter-btn { 
+      width: 31%; 
+      margin: 10px 1%; 
+      background: #666; 
+      border-radius: 4px;
     }
-    body {
-      background: #f5f7fa;
-      padding: 20px;
+    .filter-btn.active { background: #007bff; } /* 激活状态样式 */
+    #result { 
+      margin-top: 20px; 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      display: none;
     }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-    }
-    .form-item {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #555;
-      font-weight: 500;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .generate-btn {
-      width: 100%;
-      padding: 12px;
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 18px;
-      cursor: pointer;
-      margin: 20px 0;
-    }
-    .result-area {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-    .result-area h2 {
-      color: #333;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    .name-list {
-      display: grid;
-      gap: 10px;
-    }
-    .name-card {
-      padding: 15px;
-      border: 1px solid #eee;
-      border-radius: 6px;
-    }
-    .name-text {
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    .meaning-text {
-      color: #666;
-      font-size: 14px;
-    }
+    .name-item { padding: 8px 0; border-bottom: 1px dashed #eee; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>宝宝取名智能定制系统</h1>
+  <div class="box">
+    <h2>宝宝取名测试（带评分筛选）</h2>
+    姓氏：<input type="text" id="surname" placeholder="输入李/王等">
+    性别：<select id="gender">
+      <option value="girl">女宝</option>
+      <option value="boy">男宝</option>
+    </select>
+    <button class="generate-btn" onclick="testAndGenerate()">点击生成名字</button>
 
-    <!-- 核心输入项 -->
-    <div class="form-item">
-      <label for="surname">宝宝姓氏：</label>
-      <input type="text" id="surname" placeholder="请输入姓氏（如：李、王）" maxlength="2">
+    <!-- 新增：评分筛选按钮区域 -->
+    <div class="filter-area" id="filterArea" style="display: none;">
+      <span>评分筛选：</span>
+      <button class="filter-btn active" onclick="filterByNameScore('all', this)">全部</button>
+      <button class="filter-btn" onclick="filterByNameScore('95-99', this)">95-99分</button>
+      <button class="filter-btn" onclick="filterByNameScore('90-94', this)">90-94分</button>
     </div>
 
-    <div class="form-item">
-      <label for="gender">宝宝性别：</label>
-      <select id="gender">
-        <option value="girl">女宝</option>
-        <option value="boy">男宝</option>
-      </select>
-    </div>
-
-    <!-- 生成按钮 -->
-    <button class="generate-btn" onclick="generateNames()">生成定制好名</button>
-
-    <!-- 结果展示 -->
-    <div class="result-area" id="resultArea" style="display: none;">
-      <h2>为您生成的高分好名</h2>
-      <div class="name-list" id="nameList"></div>
-    </div>
+    <div id="result"></div>
   </div>
 
   <script>
-    // 最简单的名字数据库（无复杂嵌套，避免访问错误）
-    const nameData = {
-      girl: [
-        { name: "婉清", meaning: "温婉清丽，如清风拂面，寓意女子温柔贤淑" },
-        { name: "静姝", meaning: "静女其姝，寓意女子安静美好，品德端庄" },
-        { name: "采薇", meaning: "寓意女子坚韧不拔，品性高洁" },
-        { name: "思悠", meaning: "寓意女子心思细腻，温婉悠长" },
-        { name: "清芷", meaning: "寓意女子品性高洁，气质如兰" },
-        { name: "一诺", meaning: "一诺千金，寓意女子诚实守信" },
-        { name: "语桐", meaning: "寓意女子活泼开朗，生命力旺盛" },
-        { name: "梓萱", meaning: "寓意女子茁壮成长，快乐无忧" },
-        { name: "欣怡", meaning: "寓意女子生活幸福，心情舒畅" },
-        { name: "若溪", meaning: "寓意女子纯净自然，活泼灵动" }
-      ],
-      boy: [
-        { name: "子谦", meaning: "君子谦谦，寓意男子谦逊有礼，品德高尚" },
-        { name: "修远", meaning: "路漫漫其修远兮，寓意男子追求远大，坚持不懈" },
-        { name: "景行", meaning: "寓意男子品行高尚，令人敬仰" },
-        { name: "博文", meaning: "寓意男子学识渊博，知书达理" },
-        { name: "怀瑾", meaning: "寓意男子身怀美玉，品德高尚" },
-        { name: "浩然", meaning: "浩然正气，寓意男子胸怀坦荡，一身正气" },
-        { name: "宇辰", meaning: "气宇轩昂，寓意男子心胸开阔，前程远大" },
-        { name: "泽宇", meaning: "恩泽万物，寓意男子善良宽厚，风度翩翩" },
-        { name: "俊熙", meaning: "寓意男子相貌堂堂，前途光明" },
-        { name: "奕辰", meaning: "寓意男子精神饱满，光芒四射" }
-      ]
-    };
+    // 全局变量：保存所有生成的名字（含评分），用于筛选
+    let allGeneratedNames = [];
 
-    // 核心生成函数（无任何复杂逻辑，确保不报错）
-    function generateNames() {
-      // 1. 获取输入值
-      const surname = document.getElementById('surname').value.trim();
-      const gender = document.getElementById('gender').value;
-
-      // 2. 校验姓氏
-      if (!surname) {
-        alert('请输入宝宝姓氏！');
-        return;
-      }
-
-      // 3. 获取对应性别名字
-      const names = nameData[gender];
-      if (!names) {
-        alert('数据加载失败！');
-        return;
-      }
-
-      // 4. 渲染结果
-      const resultArea = document.getElementById('resultArea');
-      const nameList = document.getElementById('nameList');
+    // 第一步：先验证按钮点击是否生效（弹窗提示）
+    function testAndGenerate() {
+      alert('按钮点击生效！开始生成名字...'); // 先弹这个，证明按钮能触发
       
-      // 清空旧结果
-      nameList.innerHTML = '';
-      // 显示结果区域
-      resultArea.style.display = 'block';
+      // 第二步：获取输入值
+      const surname = document.getElementById('surname').value.trim();
+      if (!surname) {
+        alert('请输入姓氏！');
+        return;
+      }
 
-      // 5. 生成10个名字卡片
-      names.forEach(item => {
-        const fullName = surname + item.name;
-        const card = document.createElement('div');
-        card.className = 'name-card';
-        card.innerHTML = `
-          <div class="name-text">${fullName}（95分）</div>
-          <div class="meaning-text">寓意：${item.meaning}</div>
-        `;
-        nameList.appendChild(card);
+      // 第三步：名字数据（新增评分字段，90-99随机）
+      let rawNames = [];
+      if (document.getElementById('gender').value === 'girl') {
+        rawNames = [
+          { name: '婉清', score: 98 },
+          { name: '静姝', score: 97 },
+          { name: '一诺', score: 93 },
+          { name: '语桐', score: 92 },
+          { name: '梓萱', score: 96 }
+        ];
+      } else {
+        rawNames = [
+          { name: '子谦', score: 99 },
+          { name: '修远', score: 94 },
+          { name: '浩然', score: 95 },
+          { name: '宇辰', score: 91 },
+          { name: '泽宇', score: 97 }
+        ];
+      }
+
+      // 拼接姓氏，保存到全局变量（用于筛选）
+      allGeneratedNames = rawNames.map(item => ({
+        fullName: surname + item.name,
+        score: item.score
+      }));
+
+      // 第四步：显示筛选区域 + 渲染全部名字
+      document.getElementById('filterArea').style.display = 'block';
+      renderNameList(allGeneratedNames);
+      alert('名字生成完成！可使用评分筛选');
+    }
+
+    // 新增：渲染名字列表（抽离成函数，方便筛选后复用）
+    function renderNameList(nameList) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      
+      let html = '';
+      nameList.forEach(item => {
+        html += `<div class="name-item">${item.fullName}（${item.score}分）</div>`;
       });
+      resultDiv.innerHTML = html;
+    }
+
+    // 新增：评分筛选核心逻辑
+    function filterByNameScore(range, btn) {
+      // 1. 切换按钮激活状态
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // 2. 根据区间筛选名字
+      let filteredNames = [];
+      if (range === 'all') {
+        filteredNames = allGeneratedNames; // 全部
+      } else if (range === '95-99') {
+        filteredNames = allGeneratedNames.filter(item => item.score >= 95 && item.score <= 99);
+      } else if (range === '90-94') {
+        filteredNames = allGeneratedNames.filter(item => item.score >= 90 && item.score <= 94);
+      }
+
+      // 3. 重新渲染筛选后的列表
+      renderNameList(filteredNames);
     }
   </script>
 </body>
