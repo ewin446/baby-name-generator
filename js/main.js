@@ -1,6 +1,6 @@
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. 获取DOM元素
+  // 1. 获取DOM元素（适配新的类名，还原布局后的ID不变）
   const surnameInput = document.getElementById('surname');
   const birthDateInput = document.getElementById('birth-date');
   const genderSelect = document.getElementById('gender');
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.innerHTML = `
         <div class="name-info">
           <span>${item.fullName}</span>
-          <span style="color: #ff7d00; font-size: 12px;">${item.score}分</span>
+          <span style="color: #ed8936; font-size: 12px;">${item.score}分</span>
         </div>
         <span class="delete-btn" data-name="${item.fullName}">删除</span>
       `;
