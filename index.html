@@ -3,90 +3,347 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>宝宝取名测试版（数量+评分+收藏）</title>
+  <title>宝宝取名定制工具 | 500套高分好名</title>
   <style>
-    body { padding: 20px; font-family: Arial; }
-    .box { max-width: 600px; margin: 0 auto; }
-    input, select { width: 100%; padding: 8px; margin: 10px 0; box-sizing: border-box; }
-    button { padding: 10px; border: none; cursor: pointer; color: white; border-radius: 4px; }
-    .generate-btn { width: 100%; background: green; margin: 10px 0; }
-    .count-btn, .filter-btn { 
-      width: 31%; 
-      margin: 10px 1%; 
-      background: #666; 
+    /* 全局样式：贴合参考图的浅粉背景+红色主调 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft Yahei", sans-serif;
     }
-    .count-btn.active, .filter-btn.active { background: #007bff; } /* 激活状态样式 */
-    .collect-btn { 
-      background: #ffc107; 
-      padding: 4px 8px; 
-      font-size: 12px; 
-      margin-left: 10px; 
-      cursor: pointer;
+    body {
+      background-color: #fff5f5; /* 浅粉色背景 */
+      padding: 20px;
     }
-    .collect-btn.collected { background: #dc3545; } /* 已收藏样式 */
-    #result, #collectArea { 
-      margin-top: 20px; 
-      padding: 10px; 
-      border: 1px solid #ccc; 
-      display: none;
-      max-height: 400px;
-      overflow-y: auto; /* 100个名字时滚动 */
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      background: #ffffff; /* 白色表单区 */
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(230, 57, 70, 0.05);
     }
-    #collectArea { border-color: #ffc107; margin-top: 15px; }
-    .name-item { 
-      padding: 8px 0; 
-      border-bottom: 1px dashed #eee; 
-      display: flex; 
-      justify-content: space-between; 
+
+    /* 标题样式 */
+    .title-box {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .main-title {
+      color: #e63946; /* 主红色 */
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .sub-title {
+      color: #666666; /* 灰色副标题 */
+      font-size: 14px;
+    }
+
+    /* 表单项通用样式 */
+    .form-item {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      color: #333333;
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 16px;
+      background: #ffffff;
+      transition: border-color 0.3s;
+    }
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: #e63946; /* 聚焦红色边框 */
+    }
+    /* 名字风格说明文字 */
+    .style-desc {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #999999;
+      line-height: 1.4;
+    }
+
+    /* 高级设置样式 */
+    .advanced-setting {
+      margin: 20px 0;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .advanced-header {
+      padding: 12px 15px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
+      cursor: pointer;
+      background: #fafafa;
     }
-    .collect-title, .count-title, .filter-title { 
-      color: #666; 
-      margin-bottom: 8px; 
-      font-weight: bold; 
+    .advanced-title {
+      color: #333333;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .advanced-arrow {
+      color: #666666;
+      font-size: 14px;
+      transition: transform 0.3s;
+    }
+    .advanced-arrow.active {
+      transform: rotate(180deg);
+    }
+    .advanced-content {
+      padding: 15px;
+      display: none;
+    }
+    .advanced-content.show {
+      display: block;
+    }
+
+    /* 生成数量按钮组 */
+    .count-group {
+      display: flex;
+      gap: 10px;
       margin-top: 10px;
     }
+    .count-btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #e63946;
+      background: #ffffff;
+      color: #e63946;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .count-btn.active {
+      background: #e63946;
+      color: #ffffff;
+      border-color: #e63946;
+    }
+
+    /* 生成按钮 */
+    .generate-btn {
+      width: 100%;
+      padding: 15px 0;
+      background: #e63946;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 20px 0;
+      transition: background 0.3s;
+    }
+    .generate-btn:hover {
+      background: #d62828;
+    }
+
+    /* 底部提示文字 */
+    .tips-box {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666666;
+    }
+    .tips-item {
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+    .tips-icon {
+      color: #2a9d8f;
+      margin-right: 5px;
+    }
+
+    /* 筛选区域样式 */
+    .filter-area {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      display: none;
+    }
+    .filter-title {
+      color: #333333;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    .filter-group {
+      display: flex;
+      gap: 10px;
+    }
+    .filter-btn {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #666666;
+      background: #ffffff;
+      color: #666666;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: #e63946;
+      color: #ffffff;
+      border-color: #e63946;
+    }
+
+    /* 结果和收藏区域 */
+    .result-area, .collect-area {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      display: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .collect-area {
+      border-color: #e63946;
+      margin-top: 15px;
+    }
+    .result-title, .collect-title {
+      color: #e63946;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+    .name-item {
+      padding: 10px 0;
+      border-bottom: 1px dashed #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .name-text {
+      font-size: 16px;
+      color: #333333;
+    }
+    .collect-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: #ffca3a;
+      color: #333333;
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .collect-btn.collected {
+      background: #e63946;
+      color: #ffffff;
+    }
     .delete-collect {
-      background: #ccc;
-      padding: 2px 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #cccccc;
+      color: #333333;
+      border: none;
       font-size: 12px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>宝宝取名测试（数量+评分+收藏）</h2>
-    姓氏：<input type="text" id="surname" placeholder="输入李/王等">
-    性别：<select id="gender">
-      <option value="girl">女宝</option>
-      <option value="boy">男宝</option>
-    </select>
-
-    <!-- 新增：生成数量选择区域 -->
-    <div class="count-area">
-      <span class="count-title">生成数量：</span>
-      <button class="count-btn active" onclick="selectGenerateCount(10, this)">10个</button>
-      <button class="count-btn" onclick="selectGenerateCount(30, this)">30个</button>
-      <button class="count-btn" onclick="selectGenerateCount(100, this)">100个</button>
+  <div class="container">
+    <!-- 标题区域 -->
+    <div class="title-box">
+      <h1 class="main-title">宝宝取名定制工具 | 500套高分好名</h1>
+      <p class="sub-title">按姓氏/生日定制·男女各50个·含详细解析</p>
     </div>
 
-    <button class="generate-btn" onclick="testAndGenerate()">点击生成名字</button>
-
-    <!-- 评分筛选按钮区域 -->
-    <div class="filter-area" id="filterArea" style="display: none;">
-      <span class="filter-title">评分筛选：</span>
-      <button class="filter-btn active" onclick="filterByNameScore('all', this)">全部</button>
-      <button class="filter-btn" onclick="filterByNameScore('95-99', this)">95-99分</button>
-      <button class="filter-btn" onclick="filterByNameScore('90-94', this)">90-94分</button>
+    <!-- 表单区域 -->
+    <div class="form-item">
+      <label class="form-label">宝宝姓氏</label>
+      <input type="text" class="form-input" id="surname" placeholder="请输入宝宝姓氏（如：赵、李）" value="赵">
     </div>
 
-    <!-- 生成结果区域 -->
-    <div id="result"></div>
+    <div class="form-item">
+      <label class="form-label">出生日期</label>
+      <input type="date" class="form-input" id="birthday" value="2026-03-22">
+    </div>
 
-    <!-- 我的收藏区域 -->
-    <div id="collectArea">
-      <div class="collect-title">✨ 我的收藏</div>
+    <div class="form-item">
+      <label class="form-label">宝宝性别</label>
+      <select class="form-select" id="gender">
+        <option value="girl">女宝</option>
+        <option value="boy">男宝</option>
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label class="form-label">名字风格</label>
+      <select class="form-select" id="nameStyle">
+        <option value="poetic">诗意文艺</option>
+        <option value="classic">古典文雅</option>
+        <option value="modern">现代简约</option>
+        <option value="elegant">优雅大气</option>
+      </select>
+      <p class="style-desc" id="styleDesc">诗意文艺：充满诗意和文艺气息，优雅脱俗，富有浪漫情怀</p>
+    </div>
+
+    <!-- 高级设置（可折叠） -->
+    <div class="advanced-setting">
+      <div class="advanced-header" onclick="toggleAdvanced()">
+        <span class="advanced-title">✨ 高级设置</span>
+        <span class="advanced-arrow" id="advancedArrow">▼</span>
+      </div>
+      <div class="advanced-content" id="advancedContent">
+        <label class="form-label">生成数量</label>
+        <div class="count-group">
+          <button class="count-btn active" onclick="selectGenerateCount(10, this)">10个</button>
+          <button class="count-btn" onclick="selectGenerateCount(30, this)">30个</button>
+          <button class="count-btn" onclick="selectGenerateCount(50, this)">50个</button>
+          <button class="count-btn" onclick="selectGenerateCount(100, this)">100个</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 生成按钮 -->
+    <button class="generate-btn" onclick="generateNames()">生成高分名字推荐</button>
+
+    <!-- 底部提示 -->
+    <div class="tips-box">
+      <div class="tips-item">
+        <span class="tips-icon">✓</span>
+        <span>名字仅供参考，实际决定权在父母</span>
+      </div>
+      <div class="tips-item">
+        <span class="tips-icon">✓</span>
+        <span>虚拟服务不支持无理由退换，生日可修改1次</span>
+      </div>
+    </div>
+
+    <!-- 评分筛选区域 -->
+    <div class="filter-area" id="filterArea">
+      <div class="filter-title">评分筛选</div>
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="filterByNameScore('all', this)">全部</button>
+        <button class="filter-btn" onclick="filterByNameScore('95-99', this)">95-99分</button>
+        <button class="filter-btn" onclick="filterByNameScore('90-94', this)">90-94分</button>
+      </div>
+    </div>
+
+    <!-- 结果展示区域 -->
+    <div class="result-area" id="resultArea">
+      <div class="result-title">✨ 为您生成的高分好名</div>
+      <div id="nameList"></div>
+    </div>
+
+    <!-- 收藏区域 -->
+    <div class="collect-area" id="collectArea">
+      <div class="collect-title">❤️ 我的收藏</div>
       <div id="collectList"></div>
     </div>
   </div>
@@ -95,73 +352,111 @@
     // 全局变量
     let allGeneratedNames = []; // 所有生成的名字
     let collectNames = JSON.parse(localStorage.getItem('babyNameCollect')) || []; // 收藏的名字
-    let selectedCount = 10; // 默认生成10个（新增：选中的数量）
+    let selectedCount = 10; // 默认生成10个
 
-    // 基础名字库（用于动态生成足够数量的名字）
-    const baseNameData = {
-      girl: {
-        prefix: ['婉', '静', '思', '清', '语', '梓', '欣', '若', '诗', '梦'],
-        suffix: ['清', '姝', '悠', '芷', '桐', '萱', '怡', '溪', '涵', '蝶']
+    // 不同风格的名字库（贴合风格选项）
+    const styleNameData = {
+      // 诗意文艺
+      poetic: {
+        girl: { prefix: ['诗', '梦', '婉', '清', '语', '欣', '若', '溪', '涵', '蝶'], suffix: ['雅', '柔', '悠', '芷', '桐', '萱', '怡', '然', '菲', '菱'] },
+        boy: { prefix: ['辰', '轩', '泽', '景', '书', '墨', '霖', '屿', '川', '帆'], suffix: ['宇', '辰', '远', '行', '文', '瑾', '然', '风', '熙', '扬'] }
       },
-      boy: {
-        prefix: ['子', '修', '景', '博', '怀', '浩', '宇', '泽', '俊', '奕'],
-        suffix: ['谦', '远', '行', '文', '瑾', '然', '辰', '宇', '熙', '辰']
+      // 古典文雅
+      classic: {
+        girl: { prefix: ['静', '姝', '惠', '淑', '婉', '贞', '兰', '芷', '芸', '苓'], suffix: ['君', '仪', '柔', '安', '宁', '慧', '敏', '娴', '雅', '馨'] },
+        boy: { prefix: ['子', '修', '博', '怀', '景', '承', '彦', '崇', '敬', '谦'], suffix: ['谦', '远', '德', '行', '文', '瑾', '诚', '信', '明', '睿'] }
+      },
+      // 现代简约
+      modern: {
+        girl: { prefix: ['一', '安', '乐', '予', '知', '沐', '夏', '晓', '星', '晨'], suffix: ['诺', '希', '悦', '然', '宁', '禾', '甜', '橙', '柚', '柠'] },
+        boy: { prefix: ['一', '安', '乐', '予', '泽', '辰', '皓', '睿', '霖', '屿'], suffix: ['辰', '希', '然', '宁', '禾', '阳', '帆', '航', '川', '越'] }
+      },
+      // 优雅大气
+      elegant: {
+        girl: { prefix: ['瑾', '瑶', '琪', '琳', '玥', '璇', '璟', '珊', '珍', '珠'], suffix: ['萱', '怡', '宁', '慧', '敏', '雅', '柔', '安', '然', '菲'] },
+        boy: { prefix: ['浩', '瀚', '宇', '昂', '博', '宏', '昊', '霆', '晟', '睿'], suffix: ['宇', '辰', '远', '扬', '轩', '泽', '然', '熙', '航', '川'] }
       }
     };
 
     // 页面加载初始化
     window.onload = function() {
       renderCollectList();
+      // 绑定名字风格切换事件，更新说明文字
+      document.getElementById('nameStyle').addEventListener('change', updateStyleDesc);
     };
 
-    // 新增：选择生成数量
-    function selectGenerateCount(count, btn) {
-      // 更新选中数量
-      selectedCount = count;
-      // 切换按钮激活状态
-      document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      alert(`已选择生成${count}个名字`);
+    // 切换高级设置展开/收起
+    function toggleAdvanced() {
+      const content = document.getElementById('advancedContent');
+      const arrow = document.getElementById('advancedArrow');
+      content.classList.toggle('show');
+      arrow.classList.toggle('active');
+      arrow.innerText = content.classList.contains('show') ? '▲' : '▼';
     }
 
-    // 核心：生成名字函数（适配数量选择）
-    function testAndGenerate() {
+    // 更新名字风格说明文字
+    function updateStyleDesc() {
+      const style = document.getElementById('nameStyle').value;
+      const descEl = document.getElementById('styleDesc');
+      const descMap = {
+        poetic: '诗意文艺：充满诗意和文艺气息，优雅脱俗，富有浪漫情怀',
+        classic: '古典文雅：源自诗词典籍，如《诗经》《楚辞》，典雅高贵，适合书香门第',
+        modern: '现代简约：简洁易记，符合现代审美，朗朗上口，寓意美好',
+        elegant: '优雅大气：彰显气质，格局开阔，寓意前程似锦，优雅大方'
+      };
+      descEl.innerText = descMap[style];
+    }
+
+    // 选择生成数量
+    function selectGenerateCount(count, btn) {
+      selectedCount = count;
+      document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // 核心生成名字函数
+    function generateNames() {
+      // 1. 获取输入值
       const surname = document.getElementById('surname').value.trim();
+      const gender = document.getElementById('gender').value;
+      const style = document.getElementById('nameStyle').value;
+
+      // 2. 校验姓氏
       if (!surname) {
-        alert('请输入姓氏！');
+        alert('请输入宝宝姓氏！');
         return;
       }
 
-      // 根据选中的数量生成对应个数的名字
-      const gender = document.getElementById('gender').value;
-      allGeneratedNames = generateNamesByCount(surname, gender, selectedCount);
+      // 3. 根据风格+性别+数量生成名字
+      allGeneratedNames = generateNamesByStyle(surname, gender, style, selectedCount);
 
-      // 显示筛选区域 + 渲染名字
+      // 4. 显示筛选/结果/收藏区域
       document.getElementById('filterArea').style.display = 'block';
-      renderNameList(allGeneratedNames);
-      // 显示收藏区域
+      document.getElementById('resultArea').style.display = 'block';
       document.getElementById('collectArea').style.display = 'block';
-      alert(`成功生成${selectedCount}个名字！可筛选/收藏`);
+
+      // 5. 渲染名字列表（默认显示全部）
+      renderNameList(allGeneratedNames);
     }
 
-    // 新增：根据数量动态生成名字（避免手动写100个）
-    function generateNamesByCount(surname, gender, count) {
-      const nameConfig = baseNameData[gender];
+    // 根据风格生成指定数量的名字
+    function generateNamesByStyle(surname, gender, style, count) {
+      const nameConfig = styleNameData[style][gender];
       const generated = [];
       let index = 0;
 
       while (generated.length < count) {
-        // 循环组合前缀+后缀，确保名字不重复（基础库不够时重复组合）
+        // 循环组合前缀+后缀，确保名字多样性
         const prefix = nameConfig.prefix[index % nameConfig.prefix.length];
         const suffix = nameConfig.suffix[index % nameConfig.suffix.length];
         const name = prefix + suffix;
         const fullName = surname + name;
-        // 随机生成90-99分的评分
+        // 随机生成90-99分评分
         const score = Math.floor(Math.random() * 10) + 90;
 
-        // 避免重复添加（可选，也可以允许重复）
+        // 避免重复（可选）
         if (!generated.some(item => item.fullName === fullName)) {
-          generated.push({ fullName, score });
+          generated.push({ fullName, score, style });
         }
         index++;
       }
@@ -169,32 +464,38 @@
       return generated;
     }
 
-    // 渲染名字列表（兼容收藏状态）
+    // 渲染名字列表（含收藏按钮）
     function renderNameList(nameList) {
-      const resultDiv = document.getElementById('result');
-      resultDiv.style.display = 'block';
-      
-      let html = '';
+      const nameListEl = document.getElementById('nameList');
+      nameListEl.innerHTML = '';
+
+      if (nameList.length === 0) {
+        nameListEl.innerHTML = '<div style="color:#999; text-align:center; padding:20px;">暂无符合条件的名字</div>';
+        return;
+      }
+
       nameList.forEach(item => {
         const isCollected = collectNames.some(c => c.fullName === item.fullName);
         const btnClass = isCollected ? 'collect-btn collected' : 'collect-btn';
         const btnText = isCollected ? '取消收藏' : '收藏';
-        
-        html += `
-          <div class="name-item">
-            <span>${item.fullName}（${item.score}分）</span>
-            <button class="${btnClass}" onclick="toggleCollect('${item.fullName}', ${item.score}, this)">${btnText}</button>
-          </div>
+
+        const nameItem = document.createElement('div');
+        nameItem.className = 'name-item';
+        nameItem.innerHTML = `
+          <span class="name-text">${item.fullName}（${item.score}分）</span>
+          <button class="${btnClass}" onclick="toggleCollect('${item.fullName}', ${item.score}, this)">${btnText}</button>
         `;
+        nameListEl.appendChild(nameItem);
       });
-      resultDiv.innerHTML = html;
     }
 
-    // 评分筛选逻辑（无修改，兼容数量选择）
+    // 评分筛选逻辑
     function filterByNameScore(range, btn) {
+      // 切换按钮激活状态
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
+      // 筛选逻辑
       let filteredNames = [];
       if (range === 'all') {
         filteredNames = allGeneratedNames;
@@ -204,56 +505,62 @@
         filteredNames = allGeneratedNames.filter(item => item.score >= 90 && item.score <= 94);
       }
 
+      // 重新渲染
       renderNameList(filteredNames);
     }
 
-    // 收藏/取消收藏逻辑（无修改）
+    // 收藏/取消收藏
     function toggleCollect(fullName, score, btn) {
       const index = collectNames.findIndex(c => c.fullName === fullName);
-      
+
       if (index > -1) {
+        // 取消收藏
         collectNames.splice(index, 1);
         btn.classList.remove('collected');
         btn.innerText = '收藏';
         alert(`已取消收藏【${fullName}】`);
       } else {
+        // 添加收藏
         collectNames.push({ fullName, score });
         btn.classList.add('collected');
         btn.innerText = '取消收藏';
         alert(`已收藏【${fullName}】`);
       }
 
+      // 保存到本地存储
       localStorage.setItem('babyNameCollect', JSON.stringify(collectNames));
+      // 刷新收藏列表
       renderCollectList();
     }
 
-    // 渲染收藏列表（无修改）
+    // 渲染收藏列表
     function renderCollectList() {
-      const collectList = document.getElementById('collectList');
-      
+      const collectListEl = document.getElementById('collectList');
+      collectListEl.innerHTML = '';
+
       if (collectNames.length === 0) {
-        collectList.innerHTML = '<div style="color:#999;">暂无收藏的名字</div>';
+        collectListEl.innerHTML = '<div style="color:#999; text-align:center; padding:20px;">暂无收藏的名字</div>';
         return;
       }
 
-      let html = '';
       collectNames.forEach(item => {
-        html += `
-          <div class="name-item">
-            <span>${item.fullName}（${item.score}分）</span>
-            <button class="delete-collect" onclick="deleteCollect('${item.fullName}')">删除</button>
-          </div>
+        const collectItem = document.createElement('div');
+        collectItem.className = 'name-item';
+        collectItem.innerHTML = `
+          <span class="name-text">${item.fullName}（${item.score}分）</span>
+          <button class="delete-collect" onclick="deleteCollect('${item.fullName}')">删除</button>
         `;
+        collectListEl.appendChild(collectItem);
       });
-      collectList.innerHTML = html;
     }
 
-    // 删除收藏逻辑（无修改）
+    // 删除收藏的名字
     function deleteCollect(fullName) {
       if (confirm(`确定删除收藏的【${fullName}】吗？`)) {
         collectNames = collectNames.filter(c => c.fullName !== fullName);
         localStorage.setItem('babyNameCollect', JSON.stringify(collectNames));
         renderCollectList();
+        // 同步更新生成列表的收藏状态
         renderNameList(allGeneratedNames);
       }
     }
