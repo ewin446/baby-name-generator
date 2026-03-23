@@ -5,817 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>宝宝取名智能定制系统 | 500套高分好名</title>
   <style>
-    /* 全局样式：小红书母婴风（粉色主调+柔和圆角） */
+    /* 保留所有原有样式，此处省略（与上一版优化代码的样式完全一致） */
+    /* 如需完整样式，可复制上一版的<style>部分 */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
-
-    body {
-      background-color: #fef7f9;
-      color: #333;
-      padding: 15px;
-      line-height: 1.5;
-    }
-
-    /* 主容器：模拟小红书笔记卡片 */
-    .container {
-      max-width: 550px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 2px 12px rgba(255, 105, 135, 0.1);
-    }
-
-    /* 标题区域：还原原商品的温馨标题 */
-    .title-area {
-      text-align: center;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #fee;
-    }
-
-    .main-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #ff2442;
-      margin-bottom: 8px;
-    }
-
-    .sub-title {
-      font-size: 14px;
-      color: #666;
-    }
-
-    /* 激活码验证区（核心权限控制） */
-    .auth-area {
-      margin-bottom: 25px;
-      padding: 20px;
-      background: #fcf0f3;
-      border-radius: 12px;
-    }
-
-    .auth-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #ff2442;
-    }
-
-    /* 输入框样式：还原小红书表单风格 */
-    .input-group {
-      margin-bottom: 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      color: #333;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 14px 12px;
-      border: 1px solid #ffd1dc;
-      border-radius: 8px;
-      font-size: 15px;
-      background: #fff;
-      outline: none;
-    }
-
-    input:focus, select:focus {
-      border-color: #ff2442;
-      box-shadow: 0 0 0 2px rgba(255, 36, 66, 0.1);
-    }
-
-    /* 表单校验提示 */
-    .error-tip {
-      color: #ff2442;
-      font-size: 12px;
-      margin-top: 5px;
-      display: none;
-    }
-
-    /* 按钮样式：小红书同款红色按钮 */
-    .btn {
-      width: 100%;
-      padding: 15px;
-      background: #ff2442;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
-    }
-
-    .btn:hover {
-      background: #e61f3d;
-    }
-
-    .btn:disabled {
-      background: #ffcccc;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: #f8f8f8;
-      color: #666;
-    }
-
-    .btn-secondary:hover {
-      background: #f0f0f0;
-    }
-
-    /* 名字结果区 */
-    .result-area {
-      margin-top: 30px;
-      display: none;
-    }
-
-    .result-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: #ff2442;
-    }
-
-    /* 名字列表：卡片式双列布局 */
-    .name-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      max-height: 600px;
-      overflow-y: auto;
-      padding-right: 5px;
-      scroll-behavior: smooth;
-    }
-
-    /* 空状态提示 */
-    .empty-tip {
-      grid-column: 1 / 3;
-      text-align: center;
-      padding: 40px 20px;
-      color: #999;
-      font-size: 14px;
-    }
-
-    .empty-tip::before {
-      content: "📝";
-      display: block;
-      font-size: 48px;
-      margin-bottom: 10px;
-      opacity: 0.3;
-    }
-
-    /* 懒加载加载提示 */
-    .lazy-load-tip {
-      text-align: center;
-      padding: 15px;
-      color: #999;
-      font-size: 13px;
-      grid-column: 1 / 3;
-    }
-
-    .lazy-load-loading {
-      color: #ff2442;
-    }
-
-    .lazy-load-no-more {
-      color: #ccc;
-    }
-
-    /* 名字卡片样式 */
-    .name-card {
-      background: #fff;
-      border: 1px solid #fee;
-      border-radius: 10px;
-      padding: 12px;
-      transition: all 0.3s ease;
-      position: relative;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeIn 0.3s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .name-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 105, 135, 0.15);
-      border-color: #ff2442;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .name-text {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .score-tag {
-      background: #ffeff3;
-      color: #ff2442;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    /* 来源标签 */
-    .source-tag {
-      display: inline-block;
-      background: #f8f8f8;
-      color: #999;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 11px;
-      margin-bottom: 8px;
-    }
-
-    /* 寓意解析区 */
-    .meaning-area {
-      border-top: 1px dashed #ffd1dc;
-      padding-top: 8px;
-      margin-top: 8px;
-    }
-
-    .meaning-text {
-      font-size: 12px;
-      color: #666;
-      line-height: 1.6;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    /* 收藏按钮 */
-    .collect-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 16px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #ccc;
-      transition: all 0.2s;
-      z-index: 1;
-    }
-
-    .collect-btn:hover {
-      transform: scale(1.2);
-    }
-
-    .collected {
-      color: #ff2442;
-    }
-
-    /* 名字解析模块：还原原商品的多维度解析 */
-    .analysis-area {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fcf0f3;
-      border-radius: 8px;
-    }
-
-    .analysis-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #ff2442;
-    }
-
-    .analysis-item {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      margin-bottom: 5px;
-    }
-
-    /* 收藏展示区 */
-    .favorites-area {
-      margin-top: 20px;
-      display: none;
-    }
-
-    .favorites-area.show {
-      display: block;
-    }
-
-    .favorites-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: #ff2442;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .favorites-count {
-      font-size: 12px;
-      color: #999;
-      font-weight: 400;
-    }
-
-    .favorites-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .empty-favorites {
-      text-align: center;
-      padding: 40px 20px;
-      color: #999;
-      font-size: 14px;
-    }
-
-    .empty-favorites::before {
-      content: "♡";
-      display: block;
-      font-size: 48px;
-      margin-bottom: 10px;
-      opacity: 0.3;
-    }
-
-    /* 删除按钮 */
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 12px;
-      background: #fff;
-      border: 1px solid #ffd1dc;
-      color: #ff2442;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .delete-btn:hover {
-      background: #ff2442;
-      color: #fff;
-    }
-
-    /* 售后提示区：还原原商品的版权/售后 */
-    .footer-tips {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #fee;
-      font-size: 12px;
-      color: #999;
-    }
-
-    .tips-item {
-      margin-bottom: 5px;
-    }
-
-    /* 隐藏模块 */
-    .hidden {
-      display: none;
-    }
-
-    /* 加载提示动画 */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      display: none;
-    }
-
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #ffd1dc;
-      border-top: 4px solid #ff2442;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      color: #ff2442;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    /* 筛选区样式 */
-    .filter-area {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #fcf0f3;
-      border-radius: 12px;
-    }
-
-    .filter-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #ff2442;
-    }
-
-    .filter-options {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 8px 16px;
-      border: 1px solid #ff2442;
-      background: #fff;
-      color: #ff2442;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: all 0.3s;
-    }
-
-    .filter-btn:hover {
-      background: #ff2442;
-      color: #fff;
-    }
-
-    .filter-btn.active {
-      background: #ff2442;
-      color: #fff;
-    }
-
-    /* 生成数量选择 */
-    .count-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .count-btn {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ffd1dc;
-      background: #fff;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
-
-    .count-btn:hover {
-      border-color: #ff2442;
-    }
-
-    .count-btn.active {
-      background: #ff2442;
-      color: #fff;
-      border-color: #ff2442;
-    }
-
-    /* 风格说明区域 */
-    .style-description {
-      font-size: 12px;
-      color: #999;
-      margin-top: 8px;
-      padding: 8px;
-      background: #f8f8f8;
-      border-radius: 6px;
-    }
-
-    /* 评分体系说明 */
-    .score-system {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fcf0f3;
-      border-radius: 12px;
-    }
-
-    .score-system-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #ff2442;
-    }
-
-    .score-item {
-      margin-bottom: 10px;
-      font-size: 13px;
-    }
-
-    .score-item-label {
-      font-weight: 600;
-      color: #333;
-    }
-
-    .score-item-desc {
-      color: #666;
-      margin-left: 10px;
-    }
-
-    /* 信任背书区 */
-    .trust-area {
-      margin-top: 30px;
-      padding: 20px;
-      background: #fcf0f3;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .trust-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: #ff2442;
-    }
-
-    .trust-stats {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 15px;
-    }
-
-    .trust-stat-item {
-      text-align: center;
-    }
-
-    .trust-stat-number {
-      font-size: 24px;
-      font-weight: 700;
-      color: #ff2442;
-    }
-
-    .trust-stat-label {
-      font-size: 12px;
-      color: #999;
-      margin-top: 5px;
-    }
-
-    /* 底部信息区 */
-    .footer-info {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #fee;
-      font-size: 12px;
-      color: #999;
-      text-align: center;
-    }
-
-    .footer-info-item {
-      margin-bottom: 8px;
-    }
-
-    .footer-link {
-      color: #ff2442;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .footer-link:hover {
-      text-decoration: underline;
-    }
-
-    /* 模态框样式 */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: #fff;
-      border-radius: 12px;
-      padding: 25px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 24px;
-      cursor: pointer;
-      color: #999;
-      background: none;
-      border: none;
-    }
-
-    .modal-close:hover {
-      color: #ff2442;
-    }
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: #ff2442;
-      padding-right: 30px;
-    }
-
-    .modal-text {
-      font-size: 14px;
-      line-height: 1.8;
-      color: #666;
-    }
-
-    .modal-section {
-      margin-bottom: 15px;
-    }
-
-    .modal-section-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    /* 高级设置样式 */
-    .advanced-toggle {
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      user-select: none;
-    }
-
-    .advanced-toggle:hover {
-      color: #ff2442;
-    }
-
-    #advancedIcon {
-      transition: transform 0.3s ease;
-    }
-
-    #advancedSettings {
-      animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .weight-config {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-    }
-
-    .weight-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .weight-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .weight-item span:first-child {
-      width: 100px;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .weight-slider {
-      flex: 1;
-      margin: 0 15px;
-      height: 6px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: linear-gradient(to right, #ff2442, #ffd1dc);
-      border-radius: 3px;
-      cursor: pointer;
-    }
-
-    .weight-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #fff;
-      border: 3px solid #ff2442;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(255, 36, 66, 0.3);
-    }
-
-    .weight-slider::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      background: #fff;
-      border: 3px solid #ff2442;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(255, 36, 66, 0.3);
-    }
-
-    .weight-item span:last-child {
-      width: 50px;
-      text-align: right;
-      font-size: 12px;
-      font-weight: 600;
-      color: #ff2442;
-    }
-
-    /* 权重总和提示 */
-    .weight-total {
-      font-size: 12px;
-      color: #666;
-      text-align: right;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #ffd1dc;
-    }
-
-    /* 操作反馈提示 */
-    .feedback-toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      z-index: 9999;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      max-width: 80%;
-      text-align: center;
-    }
-
-    .feedback-toast.success {
-      background: rgba(46, 164, 79, 0.8);
-    }
-
-    .feedback-toast.warning {
-      background: rgba(255, 159, 64, 0.8);
-    }
-
-    .feedback-toast.error {
-      background: rgba(220, 38, 38, 0.8);
-    }
-
-    .feedback-toast.show {
-      opacity: 1;
-    }
-
-    /* 响应式适配：小屏单列布局 */
+    body { background-color: #fef7f9; color: #333; padding: 15px; line-height: 1.5; }
+    .container { max-width: 550px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 25px; box-shadow: 0 2px 12px rgba(255, 105, 135, 0.1); }
+    .title-area { text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #fee; }
+    .main-title { font-size: 20px; font-weight: 700; color: #ff2442; margin-bottom: 8px; }
+    .sub-title { font-size: 14px; color: #666; }
+    .auth-area { margin-bottom: 25px; padding: 20px; background: #fcf0f3; border-radius: 12px; }
+    .auth-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #ff2442; }
+    .input-group { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #333; }
+    input, select { width: 100%; padding: 14px 12px; border: 1px solid #ffd1dc; border-radius: 8px; font-size: 15px; background: #fff; outline: none; }
+    input:focus, select:focus { border-color: #ff2442; box-shadow: 0 0 0 2px rgba(255, 36, 66, 0.1); }
+    .error-tip { color: #ff2442; font-size: 12px; margin-top: 5px; display: none; }
+    .btn { width: 100%; padding: 15px; background: #ff2442; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+    .btn:hover { background: #e61f3d; }
+    .btn:disabled { background: #ffcccc; cursor: not-allowed; }
+    .btn-secondary { background: #f8f8f8; color: #666; }
+    .btn-secondary:hover { background: #f0f0f0; }
+    .result-area { margin-top: 30px; display: none; }
+    .result-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #ff2442; }
+    .name-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 600px; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; }
+    .empty-tip { grid-column: 1 / 3; text-align: center; padding: 40px 20px; color: #999; font-size: 14px; }
+    .empty-tip::before { content: "📝"; display: block; font-size: 48px; margin-bottom: 10px; opacity: 0.3; }
+    .lazy-load-tip { text-align: center; padding: 15px; color: #999; font-size: 13px; grid-column: 1 / 3; }
+    .lazy-load-loading { color: #ff2442; }
+    .lazy-load-no-more { color: #ccc; }
+    .name-card { background: #fff; border: 1px solid #fee; border-radius: 10px; padding: 12px; transition: all 0.3s ease; position: relative; opacity: 0; transform: translateY(10px); animation: fadeIn 0.3s ease forwards; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+    .name-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255, 105, 135, 0.15); border-color: #ff2442; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .name-text { font-size: 16px; font-weight: 600; color: #333; }
+    .score-tag { background: #ffeff3; color: #ff2442; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .source-tag { display: inline-block; background: #f8f8f8; color: #999; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-bottom: 8px; }
+    .meaning-area { border-top: 1px dashed #ffd1dc; padding-top: 8px; margin-top: 8px; }
+    .meaning-text { font-size: 12px; color: #666; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .collect-btn { position: absolute; top: 10px; right: 10px; font-size: 16px; background: none; border: none; cursor: pointer; color: #ccc; transition: all 0.2s; z-index: 1; }
+    .collect-btn:hover { transform: scale(1.2); }
+    .collected { color: #ff2442; }
+    .analysis-area { margin-top: 20px; padding: 15px; background: #fcf0f3; border-radius: 8px; }
+    .analysis-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #ff2442; }
+    .analysis-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+    .favorites-area { margin-top: 20px; display: none; }
+    .favorites-area.show { display: block; }
+    .favorites-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #ff2442; display: flex; justify-content: space-between; align-items: center; }
+    .favorites-count { font-size: 12px; color: #999; font-weight: 400; }
+    .favorites-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 400px; overflow-y: auto; }
+    .empty-favorites { text-align: center; padding: 40px 20px; color: #999; font-size: 14px; }
+    .empty-favorites::before { content: "♡"; display: block; font-size: 48px; margin-bottom: 10px; opacity: 0.3; }
+    .delete-btn { position: absolute; top: 10px; right: 10px; font-size: 12px; background: #fff; border: 1px solid #ffd1dc; color: #ff2442; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+    .delete-btn:hover { background: #ff2442; color: #fff; }
+    .footer-tips { margin-top: 30px; padding-top: 20px; border-top: 1px solid #fee; font-size: 12px; color: #999; }
+    .tips-item { margin-bottom: 5px; }
+    .hidden { display: none; }
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; display: none; }
+    .loading-spinner { width: 50px; height: 50px; border: 4px solid #ffd1dc; border-top: 4px solid #ff2442; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-text { color: #ff2442; font-size: 16px; font-weight: 600; }
+    .filter-area { margin-bottom: 20px; padding: 15px; background: #fcf0f3; border-radius: 12px; }
+    .filter-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #ff2442; }
+    .filter-options { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filter-btn { padding: 8px 16px; border: 1px solid #ff2442; background: #fff; color: #ff2442; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.3s; }
+    .filter-btn:hover { background: #ff2442; color: #fff; }
+    .filter-btn.active { background: #ff2442; color: #fff; }
+    .count-selector { display: flex; gap: 10px; margin-bottom: 10px; }
+    .count-btn { flex: 1; padding: 12px; border: 1px solid #ffd1dc; background: #fff; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .count-btn:hover { border-color: #ff2442; }
+    .count-btn.active { background: #ff2442; color: #fff; border-color: #ff2442; }
+    .style-description { font-size: 12px; color: #999; margin-top: 8px; padding: 8px; background: #f8f8f8; border-radius: 6px; }
+    .score-system { margin-top: 20px; padding: 15px; background: #fcf0f3; border-radius: 12px; }
+    .score-system-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #ff2442; }
+    .score-item { margin-bottom: 10px; font-size: 13px; }
+    .score-item-label { font-weight: 600; color: #333; }
+    .score-item-desc { color: #666; margin-left: 10px; }
+    .trust-area { margin-top: 30px; padding: 20px; background: #fcf0f3; border-radius: 12px; text-align: center; }
+    .trust-title { font-size: 15px; font-weight: 600; margin-bottom: 15px; color: #ff2442; }
+    .trust-stats { display: flex; justify-content: space-around; margin-bottom: 15px; }
+    .trust-stat-item { text-align: center; }
+    .trust-stat-number { font-size: 24px; font-weight: 700; color: #ff2442; }
+    .trust-stat-label { font-size: 12px; color: #999; margin-top: 5px; }
+    .footer-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #fee; font-size: 12px; color: #999; text-align: center; }
+    .footer-info-item { margin-bottom: 8px; }
+    .footer-link { color: #ff2442; text-decoration: none; cursor: pointer; }
+    .footer-link:hover { text-decoration: underline; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; justify-content: center; align-items: center; }
+    .modal-content { background: #fff; border-radius: 12px; padding: 25px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+    .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #999; background: none; border: none; }
+    .modal-close:hover { color: #ff2442; }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #ff2442; padding-right: 30px; }
+    .modal-text { font-size: 14px; line-height: 1.8; color: #666; }
+    .modal-section { margin-bottom: 15px; }
+    .modal-section-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: #333; }
+    .advanced-toggle { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .advanced-toggle:hover { color: #ff2442; }
+    #advancedIcon { transition: transform 0.3s ease; }
+    #advancedSettings { animation: slideDown 0.3s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .weight-config { background: #fff; padding: 15px; border-radius: 8px; }
+    .weight-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .weight-item:last-child { margin-bottom: 0; }
+    .weight-item span:first-child { width: 100px; font-size: 13px; color: #333; }
+    .weight-slider { flex: 1; margin: 0 15px; height: 6px; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #ff2442, #ffd1dc); border-radius: 3px; cursor: pointer; }
+    .weight-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: #fff; border: 3px solid #ff2442; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(255, 36, 66, 0.3); }
+    .weight-slider::-moz-range-thumb { width: 18px; height: 18px; background: #fff; border: 3px solid #ff2442; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(255, 36, 66, 0.3); }
+    .weight-item span:last-child { width: 50px; text-align: right; font-size: 12px; font-weight: 600; color: #ff2442; }
+    .weight-total { font-size: 12px; color: #666; text-align: right; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ffd1dc; }
+    .feedback-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; z-index: 9999; opacity: 0; transition: opacity 0.3s ease; max-width: 80%; text-align: center; }
+    .feedback-toast.success { background: rgba(46, 164, 79, 0.8); }
+    .feedback-toast.warning { background: rgba(255, 159, 64, 0.8); }
+    .feedback-toast.error { background: rgba(220, 38, 38, 0.8); }
+    .feedback-toast.show { opacity: 1; }
     @media (max-width: 375px) {
-      .name-list, .favorites-list {
-        grid-template-columns: 1fr;
-      }
-      .lazy-load-tip, .empty-tip {
-        grid-column: 1 / 2;
-      }
-      .count-selector {
-        flex-wrap: wrap;
-      }
-      .count-btn {
-        flex: 1 0 45%;
-      }
+      .name-list, .favorites-list { grid-template-columns: 1fr; }
+      .lazy-load-tip, .empty-tip { grid-column: 1 / 2; }
+      .count-selector { flex-wrap: wrap; }
+      .count-btn { flex: 1 0 45%; }
     }
   </style>
 </head>
@@ -1107,26 +413,45 @@
     // 模块化封装，避免全局变量污染
     const nameSystem = (function() {
       // ============================================
-      // 常量定义
+      // 常量定义（核心修改：扩展名字库，增加双字名，避免重复）
       // ============================================
       const PAGE_SIZE = 10; // 每页加载数量
-      const NAME_LIBRARY = { // 按风格分类的名字库（模拟真实数据）
-        classical: ['昱宁', '沐辰', '清菡', '景行', '婉瑜', '子谦', '书瑶', '彦辰', '静姝', '博文'],
-        modern: ['一诺', '梓涵', '欣怡', '浩宇', '诗语', '泽宇', '雨桐', '俊熙', '若曦', '宸宇'],
-        poetic: ['江月', '星垂', '晓风', '暮雪', '云舒', '松韵', '竹语', '泉鸣', '秋霁', '清辉']
+      const NAME_LIBRARY = { 
+        // 扩展每种风格的名字库（单字+双字），数量提升至50+
+        classical: [
+          '昱宁', '沐辰', '清菡', '景行', '婉瑜', '子谦', '书瑶', '彦辰', '静姝', '博文',
+          '瑾萱', '梓豪', '诗琪', '俊驰', '雨嘉', '懿轩', '欣怡', '浩宇', '梦琪', '辰逸',
+          '雅彤', '瑾瑜', '语琴', '皓轩', '紫涵', '擎宇', '若雪', '泽楷', '倩雪', '天佑',
+          '雨婷', '文昊', '玥婷', '泰宇', '凌菲', '伟泽', '钰彤', '鹏煊', '婧琪', '昊然',
+          '雅静', '沙欧', '依娜', '智渊', '雨薇', '越彬', '明美', '炫明', '可馨', '苑博'
+        ],
+        modern: [
+          '一诺', '梓涵', '欣怡', '浩宇', '诗语', '泽宇', '雨桐', '俊熙', '若曦', '宸宇',
+          '语桐', '辰轩', '思妍', '浩然', '语汐', '宇航', '佳怡', '子轩', '语萱', '皓轩',
+          '梓萱', '瑾瑜', '雨萱', '子豪', '欣妍', '浩轩', '梦瑶', '俊豪', '熙雯', '辰宇',
+          '诗涵', '泽轩', '馨怡', '宇泽', '佳琪', '皓宇', '思涵', '子辰', '雨欣', '浩宸',
+          '语欣', '梓睿', '若彤', '俊宇', '梦涵', '泽睿', '欣悦', '子墨', '语馨', '宸轩'
+        ],
+        poetic: [
+          '江月', '星垂', '晓风', '暮雪', '云舒', '松韵', '竹语', '泉鸣', '秋霁', '清辉',
+          '溪月', '星朗', '晨风', '雪晴', '云卷', '松涛', '竹韵', '泉声', '秋韵', '清光',
+          '江雪', '星汉', '晓晨', '暮云', '云帆', '松鹤', '竹溪', '泉涌', '秋华', '清逸',
+          '江枫', '星河', '晓霜', '暮雨', '云飞', '松青', '竹青', '泉清', '秋月', '清风',
+          '江潮', '星野', '晓露', '暮霞', '云鹤', '松风', '竹涛', '泉润', '秋露', '清和'
+        ]
       };
       const SOURCE_LIBRARY = ['《诗经》', '《楚辞》', '《论语》', '现代审美', '唐诗', '宋词', '元曲'];
       const MEANING_LIBRARY = [
-        '昱照心宁，内外澄明',
-        '沐风而行，辰光万里',
-        '清荷映水，菡萏飘香',
-        '高山景行，明德惟馨',
-        '温婉如玉，瑜瑾生辉',
-        '谦谦君子，温润如玉',
-        '书香致远，瑶华灼灼',
-        '彦士之才，辰星之耀',
-        '静女其姝，俟我于城隅',
-        '博文约礼，知行合一'
+        '昱照心宁，内外澄明', '沐风而行，辰光万里', '清荷映水，菡萏飘香', '高山景行，明德惟馨', '温婉如玉，瑜瑾生辉',
+        '谦谦君子，温润如玉', '书香致远，瑶华灼灼', '彦士之才，辰星之耀', '静女其姝，俟我于城隅', '博文约礼，知行合一',
+        '瑾玉温润，萱草忘忧', '梓木繁茂，豪杰之气', '诗心慧质，琪玉无瑕', '俊朗不凡，驰聘四方', '雨润嘉禾，嘉言懿行',
+        '懿德高轩，气宇轩昂', '欣然自得，怡然自乐', '浩然之气，宇量深广', '梦绕琪花，琪树琼枝', '辰光飘逸，逸群之才',
+        '雅态彤云，彤霞满天', '瑾瑜互映，美玉无瑕', '语笑嫣然，琴瑟和鸣', '皓白清朗，气宇轩昂', '紫芝涵露，涵泳优游',
+        '擎天之志，气宇轩昂', '若雪清澄，冰雪聪明', '泽被四方，楷模天下', '倩影如雪，雪月风花', '天之骄子，佑护一生',
+        '雨润婷立，婷婷玉立', '文彩斐然，昊天罔极', '玥珠生辉，婷娉婀娜', '泰山北斗，气宇轩昂', '凌波仙子，菲芳永存',
+        '伟才卓荦，泽被苍生', '钰璋温润，彤管有炜', '鹏翼煊赫，前程万里', '婧淑贤良，琪玉无瑕', '昊天罔极，然诺千金',
+        '雅态端庄，静影沉璧', '沙鸥翔集，悠然自得', '依人小鸟，娜婀多姿', '智珠在握，渊源有自', '雨润薇香，薇风拂面',
+        '越古超今，彬蔚有礼', '明丽美好，美意延年', '炫曜光明，明察秋毫', '可心如意，馨香满怀', '苑囿广阔，博学多才'
       ];
 
       // ============================================
@@ -1298,6 +623,16 @@
           clearTimeout(timer);
           timer = setTimeout(() => fn.apply(this, args), delay);
         };
+      };
+
+      /**
+       * 核心新增：检查名字是否已存在（去重逻辑）
+       * @param {string} fullname 全名（姓氏+名字）
+       * @param {Array} nameList 已生成的名字列表
+       * @returns {boolean} 是否重复
+       */
+      const isNameDuplicate = (fullname, nameList) => {
+        return nameList.some(item => item.fullname === fullname);
       };
 
       // ============================================
@@ -1520,7 +855,7 @@
           });
         },
 
-        // 生成名字核心逻辑
+        // 生成名字核心逻辑（核心修改：添加去重逻辑）
         generateNames() {
           // 表单校验
           if (!validateForm()) {
@@ -1543,19 +878,30 @@
           const gender = DOM.gender.value;
           const style = DOM.style.value;
           
-          // 生成名字数据（模拟真实逻辑：结合风格/性别/权重）
-          const namePool = shuffleArray(NAME_LIBRARY[style]);
-          const generateCount = Math.min(selectedCount, namePool.length * 10); // 避免超出名字库容量
+          // 核心修改1：扩展名字池并洗牌
+          const namePool = shuffleArray([...NAME_LIBRARY[style]]); // 深拷贝避免修改原数组
+          const maxAvaliableCount = namePool.length; // 最大可生成的唯一名字数
+          const actualGenerateCount = Math.min(selectedCount, maxAvaliableCount); // 实际生成数量（取较小值）
           
-          for (let i = 0; i < generateCount; i++) {
-            const name = namePool[i % namePool.length];
+          // 核心修改2：循环生成唯一名字（添加去重校验）
+          let generatedCount = 0;
+          let currentIndex = 0;
+          
+          while (generatedCount < actualGenerateCount && currentIndex < namePool.length) {
+            const name = namePool[currentIndex];
             const fullname = surname + name;
-            allGeneratedNames.push({
-              fullname,
-              score: generateRandomScore(),
-              source: SOURCE_LIBRARY[Math.floor(Math.random() * SOURCE_LIBRARY.length)],
-              meaning: MEANING_LIBRARY[Math.floor(Math.random() * MEANING_LIBRARY.length)]
-            });
+            
+            // 检查是否重复，不重复才添加
+            if (!isNameDuplicate(fullname, allGeneratedNames)) {
+              allGeneratedNames.push({
+                fullname,
+                score: generateRandomScore(),
+                source: SOURCE_LIBRARY[Math.floor(Math.random() * SOURCE_LIBRARY.length)],
+                meaning: MEANING_LIBRARY[Math.floor(Math.random() * MEANING_LIBRARY.length)]
+              });
+              generatedCount++;
+            }
+            currentIndex++;
           }
           
           // 初始化筛选数据
@@ -1567,6 +913,13 @@
             DOM.generateBtn.disabled = false;
             DOM.resultArea.style.display = 'block';
             
+            // 提示实际生成数量（如果用户选择的数量超过最大可用数）
+            if (actualGenerateCount < selectedCount) {
+              showFeedback(`当前风格下仅能生成${actualGenerateCount}个唯一名字，已为您生成全部`, 3000, 'warning');
+            } else {
+              showFeedback(`成功生成${allGeneratedNames.length}个高分名字`, 2000, 'success');
+            }
+            
             // 加载第一页数据
             if (filteredNames.length === 0) {
               DOM.nameList.innerHTML = `
@@ -1577,7 +930,6 @@
               return;
             }
             this.loadMoreNames();
-            showFeedback(`成功生成${allGeneratedNames.length}个高分名字`, 2000, 'success');
           }, 1000);
         }
       };
