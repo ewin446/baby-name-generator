@@ -12,12 +12,14 @@ import {
   getPlatformTemplateById,
   getSizeById,
   getVariantById,
+  highlightStyleOptions,
   palettePresets,
   patternOptions,
   platformTemplates,
   randomHighlightFromTitle,
   randomWatermarkFromTitle,
   sizeOptions,
+  watermarkPositionOptions,
 } from '../lib/cover-tool-data'
 
 const escapeXml = (value = '') => String(value)
@@ -28,25 +30,48 @@ const escapeXml = (value = '') => String(value)
   .replace(/'/g, '&apos;')
 
 const splitTitle = (title, maxCharsPerLine = 10) => {
-  const clean = String(title || '').trim()
+  const clean = String(title || '').trim().replace(/\s+/g, '')
   if (!clean) return ['文科生学', 'AI 的社群？']
   if (clean.length <= maxCharsPerLine) return [clean]
 
-  const separators = ['：', ':', '，', ',', '？', '?', '！', '!']
-  for (const sep of separators) {
-    if (clean.includes(sep)) {
-      const idx = clean.indexOf(sep)
-      if (idx > 1 && idx < clean.length - 1) {
-        const first = clean.slice(0, idx + 1)
-        const rest = clean.slice(idx + 1).trim()
-        return rest ? [first, rest] : [first]
-      }
+  const softSeparators = ['：', ':', '，', ',', '？', '?', '！', '!', '、']
+  for (const sep of softSeparators) {
+    const idx = clean.indexOf(sep)
+    if (idx > 1 && idx < clean.length - 1 && idx <= maxCharsPerLine + 1) {
+      const first = clean.slice(0, idx + 1)
+      const rest = clean.slice(idx + 1).trim()
+      if (rest) return [first, rest]
     }
   }
 
-  const targetLines = clean.length > maxCharsPerLine * 2 ? 3 : 2
-  const chunk = Math.ceil(clean.length / targetLines)
-  return Array.from({ length: targetLines }, (_, i) => clean.slice(i * chunk, (i + 1) * chunk)).filter(Boolean)
+  const chars = Array.from(clean)
+  const lines = []
+  let current = ''
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i]
+    const next = chars[i + 1] || ''
+    current += ch
+    const shouldBreakByLen = current.length >= maxCharsPerLine
+    const shouldBreakByPunc = softSeparators.includes(ch) && current.length >= Math.max(4, maxCharsPerLine - 2)
+    if ((shouldBreakByLen || shouldBreakByPunc) && next) {
+      if (/^[，。！？：、,.:!?]$/.test(next) && i + 1 < chars.length) {
+        continue
+      }
+      lines.push(current)
+      current = ''
+    }
+  }
+  if (current) lines.push(current)
+
+  const merged = []
+  for (const line of lines) {
+    if (merged.length && line.length === 1) {
+      merged[merged.length - 1] += line
+    } else {
+      merged.push(line)
+    }
+  }
+  return merged.slice(0, 4)
 }
 
 const getFontStack = (fontFamily) => {
@@ -76,7 +101,7 @@ const buildPattern = (pattern, palette, width, height) => {
   }
 }
 
-const highlightTitle = (title, highlight, accent, enabled) => {
+const highlightTitle = (title, highlight, accent, enabled, style = 'fill') => {
   const clean = String(title || '')
   const mark = String(highlight || '').trim()
   if (!enabled || !mark || !clean.includes(mark)) return escapeXml(clean)
@@ -84,7 +109,13 @@ const highlightTitle = (title, highlight, accent, enabled) => {
   const before = escapeXml(clean.slice(0, idx))
   const mid = escapeXml(mark)
   const after = escapeXml(clean.slice(idx + mark.length))
-  return `${before}<tspan fill="${accent}">${mid}</tspan>${after}`
+  const styles = {
+    fill: `<tspan fill="${accent}">${mid}</tspan>`,
+    underline: `<tspan text-decoration="underline" text-decoration-color="${accent}" text-decoration-thickness="10" text-underline-offset="18">${mid}</tspan>`,
+    marker: `<tspan fill="${accent}" style="paint-order:stroke;stroke:${accent}55;stroke-width:20;stroke-linejoin:round">${mid}</tspan>`,
+    outline: `<tspan fill="transparent" stroke="${accent}" stroke-width="6" paint-order="stroke">${mid}</tspan>`,
+  }
+  return `${before}${styles[style] || styles.fill}${after}`
 }
 
 const getLayoutProfile = (size) => {
@@ -96,6 +127,16 @@ const getLayoutProfile = (size) => {
     return { kind: 'vertical', maxCharsPerLine: 8, titleScaleBase: 0.1, kickerY: 0.24, baseY: 0.42, titleGap: 0.96, innerPad: 0.07, watermarkX: 0.52, watermarkY: 0.82, watermarkSize: 0.18, tagWidth: 0.2, tagFont: 0.016, footerY: 0.94 }
   }
   return { kind: 'square', maxCharsPerLine: 9, titleScaleBase: 0.09, kickerY: 0.26, baseY: 0.47, titleGap: 0.94, innerPad: 0.065, watermarkX: 0.56, watermarkY: 0.78, watermarkSize: 0.16, tagWidth: 0.18, tagFont: 0.014, footerY: 0.92 }
+}
+
+const getWatermarkCoords = (position, width, height, size) => {
+  const map = {
+    'bottom-right': { x: Math.round(width * 0.68), y: Math.round(height * 0.88), anchor: 'start' },
+    'center-right': { x: Math.round(width * 0.62), y: Math.round(height * 0.72), anchor: 'start' },
+    center: { x: Math.round(width * 0.5), y: Math.round(height * 0.62), anchor: 'middle' },
+    'left-bottom': { x: Math.round(width * 0.14), y: Math.round(height * 0.86), anchor: 'start' },
+  }
+  return map[position] || map['center-right']
 }
 
 const buildCoverSvg = (draft) => {
@@ -119,10 +160,9 @@ const buildCoverSvg = (draft) => {
   const tagFontSize = Math.max(18, Math.round(width * layout.tagFont))
   const kickerY = Math.round(height * layout.kickerY)
   const baseY = Math.round(height * layout.baseY)
-  const watermarkX = Math.round(width * layout.watermarkX)
-  const watermarkY = Math.round(height * layout.watermarkY)
   const watermarkSize = Math.round(width * layout.watermarkSize)
   const footerY = Math.round(height * layout.footerY)
+  const watermarkCoords = getWatermarkCoords(draft.watermarkPosition, width, height, watermarkSize)
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -130,8 +170,8 @@ const buildCoverSvg = (draft) => {
       ${draft.showInnerPanel ? `<rect x="${outerPad}" y="${outerPad}" width="${width - outerPad * 2}" height="${height - outerPad * 2}" rx="${Math.round(Math.min(width, height) * 0.042)}" fill="${palette.panel}" stroke="${palette.accentSoft}" />` : ''}
       ${draft.showEnglishTag ? `<rect x="${Math.round(width * 0.034)}" y="${Math.round(height * 0.078)}" width="${tagBoxWidth}" height="${tagBoxHeight}" rx="${Math.round(tagBoxHeight / 2)}" fill="${palette.accentSoft}" /><text x="${Math.round(width * 0.047)}" y="${Math.round(height * 0.111)}" font-family="Inter, sans-serif" font-size="${tagFontSize}" font-weight="800" letter-spacing="3" fill="${palette.text}">${englishTag}</text>` : ''}
       ${draft.showKicker ? `<text x="${innerPad}" y="${kickerY}" font-family="${font}" font-size="${subtitleSize}" font-style="italic" fill="${palette.muted}">${kicker}</text>` : ''}
-      ${lines.map((line, index) => `<text x="${innerPad}" y="${baseY + index * Math.round(titleSize * layout.titleGap)}" font-family="${font}" font-size="${titleSize}" font-weight="800" letter-spacing="-4" fill="${palette.text}">${highlightTitle(line, draft.highlight, palette.accent, draft.showHighlight)}</text>`).join('')}
-      ${draft.showWatermark ? `<text x="${watermarkX}" y="${watermarkY}" font-family="Inter, sans-serif" font-size="${watermarkSize}" font-weight="800" fill="${palette.watermark}" opacity="0.95">${watermark}</text>` : ''}
+      ${lines.map((line, index) => `<text x="${innerPad}" y="${baseY + index * Math.round(titleSize * layout.titleGap)}" font-family="${font}" font-size="${titleSize}" font-weight="800" letter-spacing="-4" fill="${palette.text}">${highlightTitle(line, draft.highlight, palette.accent, draft.showHighlight, draft.highlightStyle)}</text>`).join('')}
+      ${draft.showWatermark ? `<text x="${watermarkCoords.x}" y="${watermarkCoords.y}" text-anchor="${watermarkCoords.anchor}" font-family="Inter, sans-serif" font-size="${watermarkSize}" font-weight="800" fill="${palette.watermark}" opacity="${draft.watermarkOpacity}">${watermark}</text>` : ''}
       ${draft.showSignature ? `<text x="${innerPad}" y="${footerY}" font-family="Inter, sans-serif" font-size="${Math.max(16, Math.round(width * 0.0168))}" fill="${palette.muted}">18% · ${signature}</text>` : ''}
       ${draft.showPattern ? buildPattern(draft.pattern, palette, width, height) : ''}
     </svg>
@@ -149,6 +189,9 @@ const normalizeDraft = (saved = {}) => {
   if (!merged.sizeId) merged.sizeId = defaultDraft.sizeId
   if (!merged.platformTemplateId) merged.platformTemplateId = defaultDraft.platformTemplateId
   if (!merged.templateVariantId) merged.templateVariantId = defaultDraft.templateVariantId
+  if (!merged.highlightStyle) merged.highlightStyle = defaultDraft.highlightStyle
+  if (typeof merged.watermarkOpacity !== 'number') merged.watermarkOpacity = defaultDraft.watermarkOpacity
+  if (!merged.watermarkPosition) merged.watermarkPosition = defaultDraft.watermarkPosition
   return merged
 }
 
@@ -394,6 +437,17 @@ export default function Page() {
                   </div>
                 </label>
                 <label className="field">
+                  <span>高亮样式</span>
+                  <div className="variant-grid compact-grid">
+                    {highlightStyleOptions.map((item) => (
+                      <button key={item.id} type="button" className={draft.highlightStyle === item.id ? 'variant-chip active' : 'variant-chip'} onClick={() => updateDraft('highlightStyle', item.id)}>
+                        <strong>{item.name}</strong>
+                        <span>{item.id}</span>
+                      </button>
+                    ))}
+                  </div>
+                </label>
+                <label className="field">
                   <span>字体</span>
                   <select value={draft.fontFamily} onChange={(e) => updateDraft('fontFamily', e.target.value)}>
                     {fontOptions.map((item) => <option key={item.id}>{item.name}</option>)}
@@ -435,6 +489,24 @@ export default function Page() {
                   <div className="inline-actions">
                     <input value={draft.watermark} onChange={(e) => updateDraft('watermark', e.target.value)} placeholder="跟随标题" />
                     <button className="small-btn" type="button" onClick={() => updateDraft('watermark', randomWatermarkFromTitle(draft.title))}>随机水印</button>
+                  </div>
+                </label>
+                <label className="field">
+                  <span>水印透明度</span>
+                  <div className="range-row">
+                    <input type="range" min="0.1" max="1" step="0.05" value={draft.watermarkOpacity} onChange={(e) => updateDraft('watermarkOpacity', Number(e.target.value))} />
+                    <strong>{Math.round(draft.watermarkOpacity * 100)}%</strong>
+                  </div>
+                </label>
+                <label className="field">
+                  <span>水印位置</span>
+                  <div className="variant-grid compact-grid">
+                    {watermarkPositionOptions.map((item) => (
+                      <button key={item.id} type="button" className={draft.watermarkPosition === item.id ? 'variant-chip active' : 'variant-chip'} onClick={() => updateDraft('watermarkPosition', item.id)}>
+                        <strong>{item.name}</strong>
+                        <span>{item.id}</span>
+                      </button>
+                    ))}
                   </div>
                 </label>
                 <label className="field">

@@ -149,6 +149,7 @@ img { display: block; max-width: 100%; }
 }
 
 .variant-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.variant-grid.compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .toggle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .batch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 4px; }
 
